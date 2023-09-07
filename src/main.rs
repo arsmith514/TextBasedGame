@@ -28,7 +28,7 @@ fn title_screen() {
     println!("");
     println!("Instructions: navigate by typing commands in the terminal (for example: \"go north\").");
     println!("Enter \"i\" to see inventory.");
-    print!("\n Press a key to begin \n> ");
+    print!("\nPress a key to begin \n> ");
     io::stdout().flush().unwrap();
     let mut start_input = String::new();
     io::stdin().read_line(&mut start_input).unwrap();
