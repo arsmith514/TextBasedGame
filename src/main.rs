@@ -10,9 +10,16 @@ struct Door {
     // Any other info about the door would go here
 }
 
+
 #[derive(PartialEq, Eq, Clone, Copy)]
 struct RoomID(usize);
-
+struct GameState {
+    room_id: RoomID,
+    key: bool,
+    sunscreen: bool,
+    map: bool,
+    timer: usize,
+}
 fn main() {
     use std::io;
     // We need the Write trait so we can flush stdout
@@ -46,16 +53,23 @@ fn main() {
     let end_rooms = [RoomID(2), RoomID(3)];
     let mut input = String::new();
 
-    let mut at = RoomID(0);
+    //let mut at: RoomID = RoomID(0);
+    let mut at: GameState = GameState {
+        room_id: RoomID(0),
+        key: false,
+        sunscreen: false,
+        map: false,
+        timer: 50
+    };
     println!("The Spooky Mansion Adventure");
     println!("============================");
     println!();
     println!("You've been walking for hours in the countryside, and have finally stumbled on the spooky mansion you read about in the tour guide.");
     loop {
         // We don't want to move out of rooms, so we take a reference
-        let here = &rooms[at.0];
+        let here = &rooms[at.room_id.0];
         println!("{}\n{}", here.name, here.desc);
-        if end_rooms.contains(&at) {
+        if end_rooms.contains(&at.room_id) {
             break;
         }
         loop {
@@ -68,7 +82,7 @@ fn main() {
                 if let Some(msg) = &door.message {
                     println!("{}", msg);
                 }
-                at = door.target;
+                at.room_id = door.target;
                 break;
             } else {
                 println!("You can't do that!");
