@@ -1,8 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
-
 struct Room {
     name: String, // E.g. "Antechamber"
     desc: String, // E.g. "Dark wood paneling covers the walls.  The gilded northern doorway lies open."
