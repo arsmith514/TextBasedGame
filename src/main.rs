@@ -13,6 +13,27 @@ struct Door {
 #[derive(PartialEq, Eq, Clone, Copy)]
 struct RoomID(usize);
 
+fn title_screen() {
+    use std::io;
+    // We need the Write trait so we can flush stdout
+    use std::io::Write;
+    println!("");
+    println!("██ ███╗   ██████████╗██████╗     ██████████╗  █████████╗    ███╗   ██████████████████╗█████╗██╗   ███████████████╗██████████████╗");
+    println!("██ ████╗  ██╚══██╔══██╔═══██╗    ╚══██╔══██║  ████╔════╝    ████╗ ██████╔════╚══██╔══██╔══████║   ████╔════██╔══████╔════██╔════╝");
+    println!("██ ██╔██╗ ██║  ██║  ██║   ██║       ██║  ████████████╗      ██╔████╔███████╗    ██║  █████████║   ███████╗ ██████╔████████████╗");
+    println!("██ ██║╚██╗██║  ██║  ██║   ██║       ██║  ██╔══████╔══╝      ██║╚██╔╝████╔══╝    ██║  ██╔══██╚██╗ ██╔██╔══╝ ██╔══██╚════████╔══╝");
+    println!("██ ██║ ╚████║  ██║  ╚██████╔╝       ██║  ██║  █████████╗    ██║ ╚═╝ █████████╗  ██║  ██║  ██║╚████╔╝█████████║  ████████████████╗");
+    println!("██ ██║ ╚████║  ██║  ╚██████╔╝       ██║  ██║  █████████╗    ██║ ╚═╝ █████████╗  ██║  ██║  ██║╚████╔╝█████████║  ████████████████╗");
+    println!("╚═ ╚═╝  ╚═══╝  ╚═╝   ╚═════╝        ╚═╝  ╚═╝  ╚═╚══════╝    ╚═╝     ╚═╚══════╝  ╚═╝  ╚═╝  ╚═╝ ╚═══╝ ╚══════╚═╝  ╚═╚══════╚══════╝");                                                                                                                       
+    println!("");
+    println!("Instructions: navigate by typing commands in the terminal (for example: \"go north\").");
+    println!("Enter \"i\" to see inventory.");
+    print!("\n Press a key to begin \n> ");
+    io::stdout().flush().unwrap();
+    let mut start_input = String::new();
+    io::stdin().read_line(&mut start_input).unwrap();
+}
+
 fn main() {
     use std::io;
     // We need the Write trait so we can flush stdout
@@ -96,10 +117,8 @@ fn main() {
     let mut input = String::new();
 
     let mut at = RoomID(0);
-    println!("The Spooky Mansion Adventure");
-    println!("============================");
-    println!();
-    println!("You've been walking for hours in the countryside, and have finally stumbled on the spooky mansion you read about in the tour guide.");
+   
+    title_screen();
     loop {
         // We don't want to move out of rooms, so we take a reference
         let here = &rooms[at.0];
