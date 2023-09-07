@@ -17,33 +17,82 @@ fn main() {
     use std::io;
     // We need the Write trait so we can flush stdout
     use std::io::Write;
+
+    // room 0 = Start??
+    // room 1 = Whatsapp
+    // room 2 = VR
+    // room 3 = Library
+    // room 4 = Sunscreen room
+    // room 5 = end
+    // room 6 = nothing 
+    // room 7 = end end -- need key
+
     let rooms = [
         Room {
-            name: "Foyer".into(), // Turn a &'static string (string constant) into a String
-            desc: "This beautifully decorated foyer beckons you further into the mansion.  There is a door to the north.".into(),
-            doors: vec![Door{target:RoomID(1), triggers:vec!["door".into(), "north".into(), "go north".into()], message:None}]
+            name: "Start Room".into(), // Turn a &'static string (string constant) into a String
+            desc: "".into(),
+            doors: vec![
+                Door{target:RoomID(1), triggers:vec!["north".into(), "go north".into(), "whatsapp room".into(), "whatsapp.()".into(), "door".into()], message:None},
+                Door{target:RoomID(2), triggers:vec!["east".into(), "VR".into(), "go east".into(), "VR room".into(), "door".into()], message:None},
+                Door{target:RoomID(3), triggers:vec!["south".into(), "go south".into(), "library".into(), "door".into()], message:None},
+                ]
         },
         Room {
-            name: "Antechamber".into(),
+            name: "Whatsapp Room".into(),
             desc: "Dark wood paneling covers the walls.  An intricate painting of a field mouse hangs slightly askew on the wall (it looks like you could fix it).  The gilded northern doorway lies open to a shadowy parlour.  You can return to the foyer to the southern door.".into(),
             doors: vec![
-                Door{target:RoomID(0), triggers:vec!["door".into(), "south".into(), "go south".into(), "foyer".into()], message:None},
-                Door{target:RoomID(2), triggers:vec!["north".into(), "doorway".into(), "go north".into()], message:None},
-                Door{target:RoomID(3), triggers:vec!["painting".into(), "mouse".into(), "fix painting".into()], message:Some("As you adjust the painting, a trap-door opens beneath your feet!".into())}
+                Door{target:RoomID(0), triggers:vec!["start".into(), "south".into(), "go south".into(), "door".into()], message:None},
+                Door{target:RoomID(2), triggers:vec!["east".into(), "go east".into(), "VR room".into(), "VR".into(), "door".into()], message:None},
             ]
         },
         Room {
-            name: "A Room Full of Snakes!".into(),
-            desc: "The shadows wriggle and shift as you enter the parlour.  The floor is covered in snakes!  The walls are covered in snakes!  The ceiling is covered in snakes!  You are also covered in snakes!\n\nBAD END".into(),
-            doors:vec![]
+            name: "VR Room".into(),
+            desc: "".into(),
+            doors:vec![
+                Door{target:RoomID(0), triggers:vec!["southwest".into(), "go southwest".into(), "start".into(), "door".into()], message:None},
+                Door{target:RoomID(1), triggers:vec!["northwest".into(), "go northwest".into(), "whatsapp room".into(), "whatsapp".into(), "door".into()], message:None},
+            ]
         },
         Room {
-            name: "The Vault".into(),
-            desc: "When you regain consciousness, you feel a stabbing sensation in your lower back.  Reaching beneath you, you discover a massive diamond!  This room is full of gold and jewels, and a convenient ladder leading back outdoors!\n\nYou win!".into(),
+            name: "Library".into(),
+            desc: "".into(),
+            doors:vec![
+                Door{target:RoomID(0), triggers:vec!["north".into(), "go north".into(), "start".into(), "door".into()], message:None},
+                Door{target:RoomID(4), triggers:vec!["west".into(), "go west".into(), "sunscreen room".into(), "sun screen".into(), "sunscreen".into(), "door".into()], message:None},
+                Door{target:RoomID(6), triggers:vec!["go south".into(), "south".into(), "nothing".into(), "door".into()], message:None},
+            ]
+        },
+        Room {
+            name: "Sunscreen Room".into(),
+            desc: "".into(),
+            doors:vec![
+                Door{target:RoomID(3), triggers:vec!["east".into(), "go east".into(), "library".into(), "door".into()], message:None},
+                Door{target:RoomID(5), triggers:vec!["west".into(), "go west".into(), "end".into(), "door".into()], message:None},
+            ]
+        },
+        Room {
+            name: "End Room".into(),
+            desc: "".into(),
+            doors:vec![
+                Door{target:RoomID(4), triggers:vec!["go back".into(), "sunscreen".into(), "sun screen".into(), "door".into()], message:None},
+                Door{target:RoomID(7), triggers:vec!["end".into(), "use key".into(), "key".into(), "door".into()], message:None},
+            ]
+        },
+        Room {
+            name: "Nothing".into(),
+            desc: "You walk into a wall...".into(),
+            doors:vec![
+                Door{target:RoomID(3), triggers:vec!["turn around".into(), "go back".into(), "back".into(), "library".into()], message:None},
+            ]
+        },
+        Room {
+            name: "End End Room".into(),
+            desc: "".into(),
             doors:vec![]
-        }
+        },
     ];
-    let end_rooms = [RoomID(2), RoomID(3)];
+
+    let end_rooms = [RoomID(7)];
     let mut input = String::new();
 
     let mut at = RoomID(0);
