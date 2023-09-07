@@ -1,13 +1,13 @@
 struct Room {
     name: String, // E.g. "Antechamber"
     desc: String, // E.g. "Dark wood paneling covers the walls.  The gilded northern doorway lies open."
-    doors: Vec<Door>
+    doors: Vec<Door>,
 }
 struct Door {
-    target: RoomID, // More about this in a minute
-    triggers:Vec<String>, // e.g. "go north", "north"
-    message: Option<String> // What message, if any, to print when the doorway is traversed
-    // Any other info about the door would go here
+    target: RoomID,        // More about this in a minute
+    triggers: Vec<String>, // e.g. "go north", "north"
+    message: Option<String>, // What message, if any, to print when the doorway is traversed
+                           // Any other info about the door would go here
 }
 
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -17,16 +17,18 @@ fn title_screen() {
     use std::io;
     // We need the Write trait so we can flush stdout
     use std::io::Write;
-    println!("");
+    println!();
     println!("██ ███╗   ██████████╗██████╗     ██████████╗  █████████╗    ███╗   ██████████████████╗█████╗██╗   ███████████████╗██████████████╗");
     println!("██ ████╗  ██╚══██╔══██╔═══██╗    ╚══██╔══██║  ████╔════╝    ████╗ ██████╔════╚══██╔══██╔══████║   ████╔════██╔══████╔════██╔════╝");
     println!("██ ██╔██╗ ██║  ██║  ██║   ██║       ██║  ████████████╗      ██╔████╔███████╗    ██║  █████████║   ███████╗ ██████╔████████████╗");
     println!("██ ██║╚██╗██║  ██║  ██║   ██║       ██║  ██╔══████╔══╝      ██║╚██╔╝████╔══╝    ██║  ██╔══██╚██╗ ██╔██╔══╝ ██╔══██╚════████╔══╝");
     println!("██ ██║ ╚████║  ██║  ╚██████╔╝       ██║  ██║  █████████╗    ██║ ╚═╝ █████████╗  ██║  ██║  ██║╚████╔╝█████████║  ████████████████╗");
     println!("██ ██║ ╚████║  ██║  ╚██████╔╝       ██║  ██║  █████████╗    ██║ ╚═╝ █████████╗  ██║  ██║  ██║╚████╔╝█████████║  ████████████████╗");
-    println!("╚═ ╚═╝  ╚═══╝  ╚═╝   ╚═════╝        ╚═╝  ╚═╝  ╚═╚══════╝    ╚═╝     ╚═╚══════╝  ╚═╝  ╚═╝  ╚═╝ ╚═══╝ ╚══════╚═╝  ╚═╚══════╚══════╝");                                                                                                                       
-    println!("");
-    println!("Instructions: navigate by typing commands in the terminal (for example: \"go north\").");
+    println!("╚═ ╚═╝  ╚═══╝  ╚═╝   ╚═════╝        ╚═╝  ╚═╝  ╚═╚══════╝    ╚═╝     ╚═╚══════╝  ╚═╝  ╚═╝  ╚═╝ ╚═══╝ ╚══════╚═╝  ╚═╚══════╚══════╝");
+    println!();
+    println!(
+        "Instructions: navigate by typing commands in the terminal (for example: \"go north\")."
+    );
     println!("Enter \"i\" to see inventory.");
     print!("\nPress a key to begin \n> ");
     io::stdout().flush().unwrap();
@@ -45,7 +47,7 @@ fn main() {
     // room 3 = Library
     // room 4 = Sunscreen room
     // room 5 = end
-    // room 6 = nothing 
+    // room 6 = nothing
     // room 7 = end end -- need key
 
     let rooms = [
@@ -117,7 +119,7 @@ fn main() {
     let mut input = String::new();
 
     let mut at = RoomID(0);
-   
+
     title_screen();
     loop {
         // We don't want to move out of rooms, so we take a reference
@@ -132,7 +134,11 @@ fn main() {
             input.clear();
             io::stdin().read_line(&mut input).unwrap();
             let input = input.trim();
-            if let Some(door) = here.doors.iter().find(|d| d.triggers.iter().any(|t| *t == input)) {
+            if let Some(door) = here
+                .doors
+                .iter()
+                .find(|d| d.triggers.iter().any(|t| *t == input))
+            {
                 if let Some(msg) = &door.message {
                     println!("{}", msg);
                 }
