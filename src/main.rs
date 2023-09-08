@@ -13,6 +13,14 @@ struct Door {
 #[derive(PartialEq, Eq, Clone, Copy)]
 struct RoomID(usize);
 
+struct GameState {
+    room_id: RoomID,
+    key: bool,
+    sunscreen: bool,
+    map: bool,
+    timer: usize,
+}
+
 fn title_screen() {
     use std::io;
     // We need the Write trait so we can flush stdout
@@ -39,19 +47,50 @@ fn title_screen() {
 
 fn make_map(room: RoomID) {
     println!("                        ###### ______");
-    println!("                        # W  #       ||");
+    if room == RoomID(1) {
+        println!("                        # *W #       ||");
+    } else {
+        println!("                        # W  #       ||");
+    }
     println!("                        ######      ###### ");
-    println!("                          ||        # VR # ");
+
+    if room == RoomID(2) {
+        println!("                          ||        # *VR# ");
+    } else {
+        println!("                          ||        # VR # ");
+    }
     println!("                        ######      ###### ");
-    println!("                        # S  # ______||");
+    if room == RoomID(0) {
+        println!("                        # *S # ______||");
+    } else {
+        println!("                        # S  # ______||");
+    }
     println!("                        ######");
     println!("                          ||  ");
     println!("######______######______######");
-    println!("# E  #______# SS #______#  L #");
+
+    if room == RoomID(3) {
+        println!("# E  #______# SS #______# *L #");
+    } else if room == RoomID(4) {
+        println!("# E  #______# *SS#______# L  #");
+    } else if room == RoomID(5) {
+        println!("# *E #______# SS #______# L  #");
+    } else {
+        println!("# E  #______# SS #______# L  #");
+    }
     println!("######      ######      ######");
-    println!(" | |         | |");
+    if room == RoomID(6) {
+        println!(" | |         |*|");
+    } else {
+        println!(" | |         | |");
+    }
+
     println!("######      ######");
-    println!("# B  #");
+    if room == RoomID(7) {
+        println!("# *B #");
+    } else {
+        println!("# B  #");
+    }
     println!("######");
 }
 
@@ -74,33 +113,33 @@ fn main() {
             name: "Start Room".into(), // Turn a &'static string (string constant) into a String
             desc: "".into(),
             doors: vec![
-                Door{target:RoomID(1), triggers:vec!["north".into(), "go north".into(), "whatsapp room".into(), "whatsapp.()".into(), "door".into()], message:None},
-                Door{target:RoomID(2), triggers:vec!["east".into(), "VR".into(), "go east".into(), "VR room".into(), "door".into()], message:None},
-                Door{target:RoomID(3), triggers:vec!["south".into(), "go south".into(), "library".into(), "door".into()], message:None},
+                Door{target:RoomID(1), triggers:vec!["north".into(), "up".into(), "go up".into(), "go north".into(), "whatsapp room".into(), "whatsapp.()".into(), "door".into()], message:None},
+                Door{target:RoomID(2), triggers:vec!["east".into(), "right".into(), "go right".into(), "VR".into(), "go east".into(), "VR room".into(), "door".into()], message:None},
+                Door{target:RoomID(3), triggers:vec!["south".into(), "go south".into(), "down".into(), "go down".into(),"library".into(), "door".into()], message:None},
                 ]
         },
         Room {
             name: "Whatsapp Room".into(),
             desc: "Dark wood paneling covers the walls.  An intricate painting of a field mouse hangs slightly askew on the wall (it looks like you could fix it).  The gilded northern doorway lies open to a shadowy parlour.  You can return to the foyer to the southern door.".into(),
             doors: vec![
-                Door{target:RoomID(0), triggers:vec!["start".into(), "south".into(), "go south".into(), "door".into()], message:None},
-                Door{target:RoomID(2), triggers:vec!["east".into(), "go east".into(), "VR room".into(), "VR".into(), "door".into()], message:None},
+                Door{target:RoomID(0), triggers:vec!["start".into(), "south".into(), "go south".into(), "down".into(), "go down".into(), "door".into()], message:None},
+                Door{target:RoomID(2), triggers:vec!["east".into(), "go east".into(), "right".into(), "go right".into(), "VR room".into(), "VR".into(), "door".into()], message:None},
             ]
         },
         Room {
             name: "VR Room".into(),
             desc: "".into(),
             doors:vec![
-                Door{target:RoomID(0), triggers:vec!["southwest".into(), "go southwest".into(), "start".into(), "door".into()], message:None},
-                Door{target:RoomID(1), triggers:vec!["northwest".into(), "go northwest".into(), "whatsapp room".into(), "whatsapp".into(), "door".into()], message:None},
+                Door{target:RoomID(0), triggers:vec!["south".into(), "go south".into(), "down".into(), "go down".into(), "start".into(), "door".into()], message:None},
+                Door{target:RoomID(1), triggers:vec!["north".into(), "go north".into(), "up".into(), "go up".into(), "whatsapp room".into(), "whatsapp".into(), "door".into()], message:None},
             ]
         },
         Room {
             name: "Library".into(),
             desc: "".into(),
             doors:vec![
-                Door{target:RoomID(0), triggers:vec!["north".into(), "go north".into(), "start".into(), "door".into()], message:None},
-                Door{target:RoomID(4), triggers:vec!["west".into(), "go west".into(), "sunscreen room".into(), "sun screen".into(), "sunscreen".into(), "door".into()], message:None},
+                Door{target:RoomID(0), triggers:vec!["north".into(), "go north".into(), "up".into(), "go up".into(), "start".into(), "door".into()], message:None},
+                Door{target:RoomID(4), triggers:vec!["west".into(), "go west".into(), "left".into(), "go left".into(), "sunscreen room".into(), "sun screen".into(), "sunscreen".into(), "door".into()], message:None},
                 Door{target:RoomID(6), triggers:vec!["go south".into(), "south".into(), "nothing".into(), "door".into()], message:None},
             ]
         },
@@ -108,23 +147,24 @@ fn main() {
             name: "Sunscreen Room".into(),
             desc: "".into(),
             doors:vec![
-                Door{target:RoomID(3), triggers:vec!["east".into(), "go east".into(), "library".into(), "door".into()], message:None},
-                Door{target:RoomID(5), triggers:vec!["west".into(), "go west".into(), "end".into(), "door".into()], message:None},
+                Door{target:RoomID(3), triggers:vec!["east".into(), "go east".into(), "right".into(), "go right".into(), "library".into(), "door".into()], message:None},
+                Door{target:RoomID(5), triggers:vec!["west".into(), "go west".into(), "left".into(), "go left".into(), "end".into(), "door".into()], message:None},
+                Door{target:RoomID(6), triggers:vec!["south".into(), "go south".into(), "down".into(), "go down".into(), "nothing".into(), "door".into()], message:None},
             ]
         },
         Room {
             name: "End Room".into(),
             desc: "".into(),
             doors:vec![
-                Door{target:RoomID(4), triggers:vec!["go back".into(), "sunscreen".into(), "sun screen".into(), "door".into()], message:None},
-                Door{target:RoomID(7), triggers:vec!["end".into(), "use key".into(), "key".into(), "door".into()], message:None},
+                Door{target:RoomID(4), triggers:vec!["go back".into(), "right".into(), "go right".into(), "east".into(), "go east".into(), "sunscreen".into(), "sun screen".into(), "door".into()], message:None},
+                Door{target:RoomID(7), triggers:vec!["end".into(), "use key".into(), "key".into(), "south".into(), "go south".into(), "down".into(), "go down".into(), "door".into()], message:None},
             ]
         },
         Room {
             name: "Nothing".into(),
             desc: "You walk into a wall...".into(),
             doors:vec![
-                Door{target:RoomID(3), triggers:vec!["turn around".into(), "go back".into(), "back".into(), "library".into()], message:None},
+                Door{target:RoomID(4), triggers:vec!["turn around".into(), "go up".into(), "up".into(), "north".into(), "go north".into(), "go back".into(), "back".into(), "library".into()], message:None},
             ]
         },
         Room {
@@ -137,18 +177,25 @@ fn main() {
     let end_rooms = [RoomID(7)];
     let mut input = String::new();
 
-    let mut at = RoomID(0);
+    //let mut at: RoomID = RoomID(0);
+    let mut at: GameState = GameState {
+        room_id: RoomID(0),
+        key: false,
+        sunscreen: false,
+        map: false,
+        timer: 50,
+    };
 
     title_screen();
     loop {
         // We don't want to move out of rooms, so we take a reference
-        let here = &rooms[at.0];
+        let here = &rooms[at.room_id.0];
         println!("{}\n{}", here.name, here.desc);
-        if end_rooms.contains(&at) {
+        if end_rooms.contains(&at.room_id) {
             break;
         }
         loop {
-            make_map(RoomID(0));
+            make_map(at.room_id);
             print!("What will you do?\n> ");
             io::stdout().flush().unwrap();
             input.clear();
@@ -162,7 +209,7 @@ fn main() {
                 if let Some(msg) = &door.message {
                     println!("{}", msg);
                 }
-                at = door.target;
+                at.room_id = door.target;
                 break;
             } else {
                 println!("You can't do that!");
