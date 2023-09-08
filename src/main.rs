@@ -10,7 +10,6 @@ struct Door {
                            // Any other info about the door would go here
 }
 
-
 #[derive(PartialEq, Eq, Clone, Copy)]
 struct RoomID(usize);
 
@@ -19,14 +18,15 @@ fn title_screen() {
     // We need the Write trait so we can flush stdout
     use std::io::Write;
     println!();
-    println!("██ ███╗   ██████████╗██████╗     ██████████╗  █████████╗    ███╗   ██████████████████╗█████╗██╗   ███████████████╗██████████████╗");
-    println!("██ ████╗  ██╚══██╔══██╔═══██╗    ╚══██╔══██║  ████╔════╝    ████╗ ██████╔════╚══██╔══██╔══████║   ████╔════██╔══████╔════██╔════╝");
-    println!("██ ██╔██╗ ██║  ██║  ██║   ██║       ██║  ████████████╗      ██╔████╔███████╗    ██║  █████████║   ███████╗ ██████╔████████████╗");
-    println!("██ ██║╚██╗██║  ██║  ██║   ██║       ██║  ██╔══████╔══╝      ██║╚██╔╝████╔══╝    ██║  ██╔══██╚██╗ ██╔██╔══╝ ██╔══██╚════████╔══╝");
-    println!("██ ██║ ╚████║  ██║  ╚██████╔╝       ██║  ██║  █████████╗    ██║ ╚═╝ █████████╗  ██║  ██║  ██║╚████╔╝█████████║  ████████████████╗");
-    println!("██ ██║ ╚████║  ██║  ╚██████╔╝       ██║  ██║  █████████╗    ██║ ╚═╝ █████████╗  ██║  ██║  ██║╚████╔╝█████████║  ████████████████╗");
-    println!("╚═ ╚═╝  ╚═══╝  ╚═╝   ╚═════╝        ╚═╝  ╚═╝  ╚═╚══════╝    ╚═╝     ╚═╚══════╝  ╚═╝  ╚═╝  ╚═╝ ╚═══╝ ╚══════╚═╝  ╚═╚══════╚══════╝");
+    println!("██ ███╗   █████████╗██████╗   ██████████╗  ██ ███████╗   ███╗   ███ ██████████████╗█████╗██╗   █████████ ██████╗ ███████ ███████╗");
+    println!("██ ████╗  ██╚═██╔══██╔═══██╗  ╚══██╔══██║  ██ ██╔════╝   ████╗ ████ ██╔════╚═██╔══██╔══████║   ████╔════ ██╔══██ ██╔════ ██╔════╝");
+    println!("██ ██╔██╗ ██║ ██║  ██║   ██║     ██║  ███████ █████╗     ██╔████╔██ █████╗   ██║  █████████║   ███████╗  ██████╔ ███████ █████╗");
+    println!("██ ██║╚██╗██║ ██║  ██║   ██║     ██║  ██╔══██ ██╔══╝     ██║╚██╔╝██ ██╔══╝   ██║  ██╔══██╚██╗ ██╔██╔══╝  ██╔══██ ╚════██ ██╔══╝");
+    println!("██ ██║ ╚████║ ██║  ╚██████╔╝     ██║  ██║  ██ ███████╗   ██║ ╚═╝ ██ ███████╗ ██║  ██║  ██║╚████╔╝███████ ██║  ██ ███████ ███████╗");
+    println!("██ ██║ ╚████║ ██║  ╚██████╔╝     ██║  ██║  ██ ███████╗   ██║ ╚═╝ ██ ███████╗ ██║  ██║  ██║╚████╔╝███████ ██║  ██ ███████ ███████╗");
+    println!("╚═ ╚═╝  ╚═══╝ ╚═╝   ╚═════╝      ╚═╝  ╚═╝  ╚═ ╚══════╝   ╚═╝     ╚═ ╚══════╝ ╚═╝  ╚═╝  ╚═╝ ╚═══╝ ╚══════ ╚═╝  ╚═ ╚══════ ╚══════╝");
     println!();
+
     println!(
         "Instructions: navigate by typing commands in the terminal (for example: \"go north\")."
     );
@@ -37,13 +37,24 @@ fn title_screen() {
     io::stdin().read_line(&mut start_input).unwrap();
 }
 
-struct GameState {
-    room_id: RoomID,
-    key: bool,
-    sunscreen: bool,
-    map: bool,
-    timer: usize,
+fn make_map(room: RoomID) {
+    println!("                        ###### ______");
+    println!("                        # W  #       ||");
+    println!("                        ######      ###### ");
+    println!("                          ||        # VR # ");
+    println!("                        ######      ###### ");
+    println!("                        # S  # ______||");
+    println!("                        ######");
+    println!("                          ||  ");
+    println!("######______######______######");
+    println!("# E  #______# SS #______#  L #");
+    println!("######      ######      ######");
+    println!(" | |         | |");
+    println!("######      ######");
+    println!("# B  #");
+    println!("######");
 }
+
 fn main() {
     use std::io;
     // We need the Write trait so we can flush stdout
@@ -56,7 +67,7 @@ fn main() {
     // room 4 = Sunscreen room
     // room 5 = end
     // room 6 = nothing
-    // room 7 = end end -- need key
+    // room 7 = battle -- need key
 
     let rooms = [
         Room {
@@ -117,7 +128,7 @@ fn main() {
             ]
         },
         Room {
-            name: "End End Room".into(),
+            name: "Battle Room".into(),
             desc: "".into(),
             doors:vec![]
         },
@@ -126,23 +137,18 @@ fn main() {
     let end_rooms = [RoomID(7)];
     let mut input = String::new();
 
-    //let mut at: RoomID = RoomID(0);
-    let mut at: GameState = GameState {
-        room_id: RoomID(0),
-        key: false,
-        sunscreen: false,
-        map: false,
-        timer: 50
-    };
+    let mut at = RoomID(0);
+
     title_screen();
     loop {
         // We don't want to move out of rooms, so we take a reference
-        let here = &rooms[at.room_id.0];
+        let here = &rooms[at.0];
         println!("{}\n{}", here.name, here.desc);
-        if end_rooms.contains(&at.room_id) {
+        if end_rooms.contains(&at) {
             break;
         }
         loop {
+            make_map(RoomID(0));
             print!("What will you do?\n> ");
             io::stdout().flush().unwrap();
             input.clear();
@@ -156,7 +162,7 @@ fn main() {
                 if let Some(msg) = &door.message {
                     println!("{}", msg);
                 }
-                at.room_id = door.target;
+                at = door.target;
                 break;
             } else {
                 println!("You can't do that!");
