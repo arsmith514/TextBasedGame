@@ -379,11 +379,14 @@ fn main() {
         sunscreen: false,
         map: false,
         win: false,
-        timer: 50,
+        timer: 2,
     };
 
     title_screen();
     loop {
+        if at.timer == 0 {
+            break;
+        }
         // We don't want to move out of rooms, so we take a reference
         let here = &rooms[at.room_id.0];
         if !at.sunscreen {
@@ -437,9 +440,7 @@ fn main() {
             at.win = true;
             break;
         }
-        if at.timer == 0 {
-            break;
-        }
+    
         loop {
             print!("What will you do?\n");
             print!("({} minutes remain)\n> ", at.timer);
@@ -459,6 +460,9 @@ fn main() {
                 at.timer -= 1;
                 break;
             } else {
+                if at.timer == 0{
+                    break;
+                }
                 at.timer -=1;
                 println!("Nothing there, unforunately. Your breathing starts to get more labored.");
             }
