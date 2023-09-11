@@ -20,6 +20,7 @@ struct GameState {
     key: bool,
     sunscreen: bool,
     map: bool,
+    win: bool,
     timer: usize,
 }
 
@@ -113,8 +114,8 @@ fn main() {
     let rooms = [
         Room {
             name: "Start Room".into(), // Turn a &'static string (string constant) into a String
-            desc_light: "its light".into(),
-            desc_dark: "its dark".into(),
+            desc_light: "You see an entryway to the north, east, and south.".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. If only you could find a light...".into(),
             doors: vec![
                 Door {
                     target: RoomID(1),
@@ -159,7 +160,7 @@ fn main() {
         Room {
             name: "Whatsapp Room".into(),
             desc_light: "its light".into(),
-            desc_dark: "its dark".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. If only you could find a light...".into(),
             doors: vec![
                 Door {
                     target: RoomID(0),
@@ -371,12 +372,13 @@ fn main() {
     let end_rooms = [RoomID(7)];
     let mut input = String::new();
 
-    //let mut at: RoomID = RoomID(0);
+   
     let mut at: GameState = GameState {
         room_id: RoomID(0),
         key: false,
         sunscreen: false,
         map: false,
+        win: false,
         timer: 50,
     };
 
@@ -422,7 +424,7 @@ fn main() {
                 let try_ss = try_ss.trim();
                 if try_ss == "yes" {
                     at.sunscreen = true;
-                    println!("you see the light! (its a good thing!)");
+                    println!("The lamp reveals all the doorways, oddly enough lathered in suncreen. By now knowing where all the entryways are, you'll have a much easier time getting around.");
                     break;
                 }
                 if try_ss == "no" {
@@ -432,6 +434,7 @@ fn main() {
         }
 
         if end_rooms.contains(&at.room_id) {
+            at.win = true;
             break;
         }
         if at.timer == 0 {
@@ -453,11 +456,20 @@ fn main() {
                     println!("{}", msg);
                 }
                 at.room_id = door.target;
-                at.timer -=1;
+                at.timer -= 1;
                 break;
             } else {
-                println!("You can't do that!");
+                at.timer -=1;
+                println!("Nothing there, unforunately. Your breathing starts to get more labored.");
             }
         }
+    }
+    if at.win == true{
+        println!("You see a blinding light...as you step forward you emerge onto the sunny streets of Menlo Park. A new, yet uncertain future awaits for you.");
+        println!("THE END");
+    }
+    if at.win == false {
+        println!("You collapse to the ground, out of breath. As your vision starts to fade, you see ZUCK crouching over you, smiling. The last words you hear are: 'unfortnately there's going to be another around of layoffs...'");
+        println!("THE END");
     }
 }
