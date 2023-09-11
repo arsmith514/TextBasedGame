@@ -47,15 +47,6 @@ fn title_screen() {
     io::stdin().read_line(&mut start_input).unwrap();
 }
 
-<<<<<<< HEAD
-struct GameState {
-    room_id: RoomID,
-    key: bool,
-    sunscreen: bool,
-    map: bool,
-    timer: usize,
-}
-=======
 fn make_map(room: RoomID) {
     println!("                        ###### ______");
     if room == RoomID(1) {
@@ -105,7 +96,6 @@ fn make_map(room: RoomID) {
     println!("######");
 }
 
->>>>>>> d758df75b1826e0a4fe48e09b00b11809d0d3bdd
 fn main() {
     use std::io;
     // We need the Write trait so we can flush stdout
@@ -387,21 +377,13 @@ fn main() {
         key: false,
         sunscreen: false,
         map: false,
-<<<<<<< HEAD
-        timer: 50
-    };
-=======
         timer: 50,
     };
 
->>>>>>> d758df75b1826e0a4fe48e09b00b11809d0d3bdd
     title_screen();
     loop {
         // We don't want to move out of rooms, so we take a reference
         let here = &rooms[at.room_id.0];
-<<<<<<< HEAD
-        println!("{}\n{}", here.name, here.desc);
-=======
         if !at.sunscreen {
             println!("{}\n{}", here.name, here.desc_dark);
         } else {
@@ -449,12 +431,15 @@ fn main() {
             }
         }
 
->>>>>>> d758df75b1826e0a4fe48e09b00b11809d0d3bdd
         if end_rooms.contains(&at.room_id) {
             break;
         }
+        if at.timer == 0 {
+            break;
+        }
         loop {
-            print!("What will you do?\n> ");
+            print!("What will you do?\n");
+            print!("({} minutes remain)\n> ", at.timer);
             io::stdout().flush().unwrap();
             input.clear();
             io::stdin().read_line(&mut input).unwrap();
@@ -468,6 +453,7 @@ fn main() {
                     println!("{}", msg);
                 }
                 at.room_id = door.target;
+                at.timer -=1;
                 break;
             } else {
                 println!("You can't do that!");
