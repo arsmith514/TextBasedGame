@@ -115,7 +115,7 @@ fn main() {
         Room {
             name: "Start Room".into(), // Turn a &'static string (string constant) into a String
             desc_light: "You see an entryway to the north, east, and south.".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. If only you could find a light...".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
                     target: RoomID(1),
@@ -160,7 +160,7 @@ fn main() {
         Room {
             name: "Whatsapp Room".into(),
             desc_light: "its light".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. If only you could find a light...".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
                     target: RoomID(0),
@@ -192,7 +192,7 @@ fn main() {
         Room {
             name: "VR Room".into(),
             desc_light: "its light".into(),
-            desc_dark: "its dark".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
                     target: RoomID(0),
@@ -224,7 +224,7 @@ fn main() {
         Room {
             name: "Library".into(),
             desc_light: "its light".into(),
-            desc_dark: "its dark".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
                     target: RoomID(0),
@@ -310,7 +310,7 @@ fn main() {
         Room {
             name: "End Room".into(),
             desc_light: "its light".into(),
-            desc_dark: "its dark".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
                     target: RoomID(4),
@@ -345,7 +345,7 @@ fn main() {
         Room {
             name: "Nothing".into(),
             desc_light: "its light".into(),
-            desc_dark: "its dark".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![Door {
                 target: RoomID(4),
                 triggers: vec![
@@ -364,7 +364,7 @@ fn main() {
         Room {
             name: "Battle Room".into(),
             desc_light: "its light".into(),
-            desc_dark: "its dark".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![],
         },
     ];
@@ -398,14 +398,14 @@ fn main() {
         // get map logic
         if at.room_id == RoomID(2) && !at.map {
             loop {
-                print!("you see thing with VR - do you try it on? (yes or no) \n>");
+                print!("However, as you walk around, you step on some kind of headset - do you try it on? (yes or no) \n>");
                 io::stdout().flush().unwrap();
                 let mut try_vr = String::new();
                 io::stdin().read_line(&mut try_vr).unwrap();
                 let try_vr = try_vr.trim();
                 if try_vr == "yes" {
                     at.map = true;
-                    println!("you see a map!");
+                    println!("With the headset on, you see a map with your current location in AR! Turns out all the other features are locked in beta, but this will at least make things a little easier.");
                     make_map(at.room_id);
                     break;
                 }
@@ -424,7 +424,7 @@ fn main() {
                 let try_ss = try_ss.trim();
                 if try_ss == "yes" {
                     at.sunscreen = true;
-                    println!("The lamp reveals all the doorways, oddly enough lathered in suncreen. By now knowing where all the entryways are, you'll have a much easier time getting around.");
+                    println!("The lamp reveals the entire room with all its doorways, oddly enough lathered in sunscreen. With this, you'll have a much easier time getting around.");
                     break;
                 }
                 if try_ss == "no" {
