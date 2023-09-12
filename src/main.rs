@@ -22,6 +22,7 @@ struct GameState {
     map: bool,
     win: bool,
     timer: usize,
+    boss_hp : usize
 }
 
 fn title_screen() {
@@ -110,6 +111,9 @@ fn main() {
     // room 5 = end
     // room 6 = nothing
     // room 7 = battle -- need key
+    // room 8 = use social network in battle
+    // room 9 = use lizard spray in battle
+    // room 10 = use data privacy regulations in battle
 
     let rooms = [
         Room {
@@ -362,14 +366,152 @@ fn main() {
             }],
         },
         Room {
-            name: "Battle Room".into(),
-            desc_light: "its light".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
-            doors: vec![],
+            name: "BOSS FIGHT".into(),
+            desc_light: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something against him.".into(),
+            desc_dark: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something against him.".into(),
+            doors: vec![Door {
+                target: RoomID(8),
+                triggers: vec![
+                    "use movie".into(),
+                    "movie".into(),
+                    "the social network".into(),
+                    "show movie".into(),
+                    "show social network".into(),
+                    "use social network".into(),
+                    "use the movie".into(),
+                    "show the social network".into(),
+                    "use the social network".into(),
+                ],
+                message: None,
+            }, Door {
+                target: RoomID(9),
+                triggers: vec![
+                    "use lizard spray".into(),
+                    "spray".into(),
+                    "use spray".into(),
+                    "use the spray".into(),
+                    "spray him".into(),
+                    "lizard spray".into(),
+                ],
+                message: None,
+            },
+            Door {
+                target: RoomID(10),
+                triggers: vec![
+                    "use regulations".into(),
+                    "regulations".into(),
+                    "show regulations".into(),
+                    "show the regulations".into(),
+                    "use data privacy regulations".into(),
+                    "use the data privacy regulations".into(),
+                    "show the data privacy regulations".into(),
+                ],
+                message: None,
+            },
+            ],
         },
+        Room {
+            name: "BOSS FIGHT".into(),
+            desc_light: "You show him a copy of the popular 2010s movie, the social network. ZUCK starts groaning in agony.".into(),
+            desc_dark: "You show him a copy of the popular 2010s movie, the social network. ZUCK starts groaning in agony.".into(),
+            doors: vec![Door {
+                target: RoomID(9),
+                triggers: vec![
+                    "use lizard spray".into(),
+                    "spray".into(),
+                    "use spray".into(),
+                    "use the spray".into(),
+                    "spray him".into(),
+                    "lizard spray".into(),
+                ],
+                message: None,
+            },
+            Door {
+                target: RoomID(10),
+                triggers: vec![
+                    "use regulations".into(),
+                    "regulations".into(),
+                    "show regulations".into(),
+                    "show the regulations".into(),
+                    "use data privacy regulations".into(),
+                    "use the data privacy regulations".into(),
+                    "show the data privacy regulations".into(),
+                ],
+                message: None,
+            },
+            ],
+        },
+        
+        Room {
+            name: "BOSS FIGHT".into(),
+            desc_light: "You spray ZUCK with the lizard repellent. He starts coughing heavily, and falls to his knees.".into(),
+            desc_dark: "You spray ZUCK with the lizard repellent. He starts coughing heavily, and falls to his knees.".into(),
+            doors: vec![Door {
+                target: RoomID(8),
+                triggers: vec![
+                    "use movie".into(),
+                    "movie".into(),
+                    "the social network".into(),
+                    "show movie".into(),
+                    "show social network".into(),
+                    "use social network".into(),
+                    "use the movie".into(),
+                    "show the social network".into(),
+                    "use the social network".into(),
+                ],
+                message: None,
+            },
+            Door {
+                target: RoomID(10),
+                triggers: vec![
+                    "use regulations".into(),
+                    "regulations".into(),
+                    "show regulations".into(),
+                    "show the regulations".into(),
+                    "use data privacy regulations".into(),
+                    "use the data privacy regulations".into(),
+                    "show the data privacy regulations".into(),
+                ],
+                message: None,
+            },
+            ],
+        },
+        Room {
+            name: "BOSS FIGHT".into(),
+            desc_light: "You show ZUCK the data privacy regulations. He scoffs, unaffected. 'These people just submit their data anyway. They 'trust me'. Dumb fucks.'".into(),
+            desc_dark: "You show ZUCK the data privacy regulations. He scoffs, unaffected. 'These people just submit their data anyway. They 'trust me'. Dumb fucks.'".into(),
+            doors: vec![Door {
+                target: RoomID(8),
+                triggers: vec![
+                    "use movie".into(),
+                    "movie".into(),
+                    "the social network".into(),
+                    "show movie".into(),
+                    "show social network".into(),
+                    "use social network".into(),
+                    "use the movie".into(),
+                    "show the social network".into(),
+                    "use the social network".into(),
+                ],
+                message: None,
+            }, Door {
+                target: RoomID(9),
+                triggers: vec![
+                    "use lizard spray".into(),
+                    "spray".into(),
+                    "use spray".into(),
+                    "use the spray".into(),
+                    "spray him".into(),
+                    "lizard spray".into(),
+                ],
+                message: None,
+            },
+            ],
+        },
+        
     ];
 
-    let end_rooms = [RoomID(7)];
+    let end_rooms = [RoomID(8), RoomID(9)];
     let mut input = String::new();
 
    
@@ -379,7 +521,8 @@ fn main() {
         sunscreen: false,
         map: false,
         win: false,
-        timer: 2,
+        timer: 20,
+        boss_hp: 2,
     };
 
     title_screen();
@@ -395,7 +538,7 @@ fn main() {
             println!("{}\n{}", here.name, here.desc_light);
         }
 
-        if at.map {
+        if at.map && (at.room_id.0 != 7) && (at.room_id.0 != 8) && (at.room_id.0 != 9) && (at.room_id.0 != 10) {
             make_map(at.room_id);
         }
         // get map logic
@@ -437,7 +580,12 @@ fn main() {
         }
 
         if end_rooms.contains(&at.room_id) {
-            at.win = true;
+            at.boss_hp -=1;
+            if at.boss_hp == 0 {
+                at.win = true;
+            }
+        }
+        if at.win == true {
             break;
         }
     
@@ -464,7 +612,7 @@ fn main() {
                     break;
                 }
                 at.timer -=1;
-                println!("Nothing there, unforunately. Your breathing starts to get more labored.");
+                println!("That doesn't seem to work, unfortunately. Your breathing starts to get more labored.");
             }
         }
     }
