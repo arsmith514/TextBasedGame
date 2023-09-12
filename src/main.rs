@@ -551,9 +551,7 @@ fn main() {
 
     title_screen();
     loop {
-        if at.timer == 0 {
-            break;
-        }
+        
         // We don't want to move out of rooms, so we take a reference
         let here = &rooms[at.room_id.0];
         if !at.sunscreen {
@@ -712,7 +710,9 @@ fn main() {
         if at.win == true {
             break;
         }
-    
+        if at.timer == 0 {
+            break;
+        }
         loop {
             print!("What will you do?\n");
             print!("({} minutes remain)\n> ", at.timer);
