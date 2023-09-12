@@ -586,6 +586,9 @@ fn main() {
                 if try_vr == "no" {
                     break;
                 }
+                if try_vr == "i" {
+                    display_inventory(at)
+                }
             }
         }
 
@@ -605,6 +608,9 @@ fn main() {
                 }
                 if try_ss == "no" {
                     break;
+                }
+                if try_ss == "i" {
+                    display_inventory(at)
                 }
             }
         }
@@ -631,6 +637,9 @@ fn main() {
                 if try_ss == "no" {
                     break;
                 }
+                if try_ss == "i" {
+                    display_inventory(at)
+                }
             }
         }
         
@@ -654,6 +663,9 @@ fn main() {
                 }
                 if try_ss == "no" {
                     break;
+                }
+                if try_ss == "i" {
+                    display_inventory(at)
                 }
             }
         }
@@ -680,6 +692,9 @@ fn main() {
                 if try_ss == "no" {
                     break;
                 }
+                if try_ss == "i" {
+                    display_inventory(at)
+                }
             }
         } 
 
@@ -703,6 +718,9 @@ fn main() {
                 }
                 if try_ss == "no" {
                     break;
+                }
+                if try_ss == "i" {
+                    display_inventory(at)
                 }
             }
         }
