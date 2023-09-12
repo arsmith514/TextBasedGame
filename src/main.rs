@@ -15,6 +15,7 @@ struct Door {
 #[derive(PartialEq, Eq, Clone, Copy)]
 struct RoomID(usize);
 
+#[derive(PartialEq, Eq, Clone, Copy)]
 struct GameState {
     room_id: RoomID,
     key: bool,
@@ -22,6 +23,9 @@ struct GameState {
     map: bool,
     win: bool,
     timer: usize,
+    spray: bool, // anti lizard spray
+    data_reg: bool, // data-privacy regulations
+    social_net: bool // copy of the Social Network
 }
 
 fn title_screen() {
@@ -97,6 +101,22 @@ fn make_map(room: RoomID) {
     println!("######");
 }
 
+fn display_inventory(current: GameState) {
+    println!("   ___                                _                    _  _ ");
+    println!("  |_ _|  _ _    __ __   ___   _ _    | |_    ___     _ _  | || | ");
+    println!("   | |  | ' \\   \\ V /  / -_) | ' \\   |  _|  / _ \\   | '_|  \\_, | ");
+    println!("  |___| |_||_|  _\\_/_  \\___| |_||_|  _\\__|  \\___/  _|_|_  _|__/  ");
+    println!("_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_| \"\"\"\"| ");
+    println!("\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-` \n");
+    if current.data_reg {println!("   *data-privacy regulations");}
+    if current.key {println!("   *key");}
+    if current.map {println!("   *map");}
+    if current.social_net {println!("   *The Social Network");}
+    if current.spray {println!("   *anti-lizard spray");}
+    if current.sunscreen {println!("   *UV lamp");}
+   
+    println!("")
+}
 fn main() {
     use std::io;
     // We need the Write trait so we can flush stdout
@@ -379,8 +399,12 @@ fn main() {
         sunscreen: false,
         map: false,
         win: false,
-        timer: 2,
+        timer: 20,
+        spray: false, // anti lizard spray
+        data_reg: false, // data-privacy regulations
+        social_net: false // copy of the Social Network
     };
+
 
     title_screen();
     loop {
@@ -448,7 +472,10 @@ fn main() {
             input.clear();
             io::stdin().read_line(&mut input).unwrap();
             let input = input.trim();
-            if let Some(door) = here
+            if input == "i" {
+                display_inventory(at);
+            } else {
+                if let Some(door) = here
                 .doors
                 .iter()
                 .find(|d| d.triggers.iter().any(|t| *t == input))
@@ -465,6 +492,7 @@ fn main() {
                 }
                 at.timer -=1;
                 println!("Nothing there, unforunately. Your breathing starts to get more labored.");
+            }
             }
         }
     }
