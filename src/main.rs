@@ -18,14 +18,14 @@ struct RoomID(usize);
 #[derive(PartialEq, Eq, Clone, Copy)]
 struct GameState {
     room_id: RoomID,
-    key: bool,
-    sunscreen: bool,
-    map: bool,
+    key: bool, //library
+    sunscreen: bool, // SS
+    map: bool, // VR
     win: bool,
     timer: usize,
-    spray: bool, // anti lizard spray
-    data_reg: bool, // data-privacy regulations
-    social_net: bool // copy of the Social Network
+    spray: bool, // anti lizard spray -- end room
+    data_reg: bool, // data-privacy regulations -- Whatsapp room
+    social_net: bool // copy of the Social Network -- start
 }
 
 fn title_screen() {
@@ -108,12 +108,12 @@ fn display_inventory(current: GameState) {
     println!("  |___| |_||_|  _\\_/_  \\___| |_||_|  _\\__|  \\___/  _|_|_  _|__/  ");
     println!("_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_| \"\"\"\"| ");
     println!("\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-` \n");
-    if current.data_reg {println!("   *data-privacy regulations");}
-    if current.key {println!("   *key");}
-    if current.map {println!("   *map");}
-    if current.social_net {println!("   *The Social Network");}
-    if current.spray {println!("   *anti-lizard spray");}
-    if current.sunscreen {println!("   *UV lamp");}
+    if current.data_reg {println!("   * data-privacy regulations");}
+    if current.key {println!("   * key");}
+    if current.map {println!("   * map");}
+    if current.social_net {println!("   * The Social Network");}
+    if current.spray {println!("   * anti-lizard spray");}
+    if current.sunscreen {println!("   * UV lamp");}
    
     println!("")
 }
@@ -422,10 +422,15 @@ fn main() {
         if at.map {
             make_map(at.room_id);
         }
+
         // get map logic
         if at.room_id == RoomID(2) && !at.map {
             loop {
-                print!("However, as you walk around, you step on some kind of headset - do you try it on? (yes or no) \n>");
+                if at.sunscreen {
+                    print!("You see a VR headset on the ground - do you try it on? (yes or no) \n>")
+                } else {
+                    print!("As you crawl around, you feel some kind of headset - do you try it on? (yes or no) \n>"); 
+                }
                 io::stdout().flush().unwrap();
                 let mut try_vr = String::new();
                 io::stdin().read_line(&mut try_vr).unwrap();
@@ -442,9 +447,10 @@ fn main() {
             }
         }
 
+        // get UV lamp logic
         if at.room_id == RoomID(4) && !at.sunscreen {
             loop {
-                print!("you see a UV lamp - do you grab it?\n>");
+                print!("You see a UV lamp - do you grab it? (yes or no) \n>");
                 io::stdout().flush().unwrap();
                 let mut try_ss = String::new();
                 io::stdin().read_line(&mut try_ss).unwrap();
@@ -452,6 +458,100 @@ fn main() {
                 if try_ss == "yes" {
                     at.sunscreen = true;
                     println!("The lamp reveals the entire room with all its doorways, oddly enough lathered in sunscreen. With this, you'll have a much easier time getting around.");
+                    break;
+                }
+                if try_ss == "no" {
+                    break;
+                }
+            }
+        }
+
+        // get social_net logic
+        if at.room_id == RoomID(0) && !at.social_net {
+            loop {
+                if at.sunscreen {
+                    print!("You see a copy of The Social Network - do you grab it? (yes or no) \n>");
+                } else {
+                    print!("As you search around, you feel a DVD case. It feels like The Social Network... - do you grab it? (yes or no) \n>")
+                }
+                
+                io::stdout().flush().unwrap();
+                let mut try_ss = String::new();
+                io::stdin().read_line(&mut try_ss).unwrap();
+                let try_ss = try_ss.trim();
+                if try_ss == "yes" {
+                    at.social_net = true;
+                    println!("You stuff it in your bag.");
+                    break;
+                }
+                if try_ss == "no" {
+                    break;
+                }
+            }
+        }
+        
+        // get data_reg logic
+        if at.room_id == RoomID(1) && !at.data_reg {
+            loop {
+                if at.sunscreen {
+                    print!("You see a printed copy of data privacy regulations - do you grab it? (yes or no) \n>");
+                } else {
+                    print!("You feel a large stack of paper. Zuck has been reading about data privacy regulations recently... - do you grab it? (yes or no) \n>");
+                }
+                io::stdout().flush().unwrap();
+                let mut try_ss = String::new();
+                io::stdin().read_line(&mut try_ss).unwrap();
+                let try_ss = try_ss.trim();
+                if try_ss == "yes" {
+                    at.data_reg = true;
+                    println!("You stuff it in your bag.");
+                    break;
+                }
+                if try_ss == "no" {
+                    break;
+                }
+            }
+        }
+
+        // get spray logic
+        if at.room_id == RoomID(5) && !at.spray {
+            loop {
+                if at.sunscreen {
+                    print!("You see an anti-lizard spray - do you grab it? (yes or no) \n>");
+                } else {
+                    print!("You feel a canister... a spray... it could be for lizards... - do you grab it? (yes or no) \n>");
+                }
+                
+                io::stdout().flush().unwrap();
+                let mut try_ss = String::new();
+                io::stdin().read_line(&mut try_ss).unwrap();
+                let try_ss = try_ss.trim();
+                if try_ss == "yes" {
+                    at.spray = true;
+                    println!("You stuff it in your bag.");
+                    break;
+                }
+                if try_ss == "no" {
+                    break;
+                }
+            }
+        } 
+
+        // get key logic
+        if at.room_id == RoomID(3) && !at.key {
+            loop {
+                if at.sunscreen {
+                    print!("You see a key - do you grab it? (yes or no) \n>");
+                } else {
+                    print!("You nearly trip over a key - do you grab it? (yes or no) \n>");
+                }
+                io::stdout().flush().unwrap();
+                let mut try_ss = String::new();
+                io::stdin().read_line(&mut try_ss).unwrap();
+                let try_ss = try_ss.trim();
+                if try_ss == "yes" {
+                    at.key = true;
+                    println!("You stuff it in your bag.");
                     break;
                 }
                 if try_ss == "no" {
