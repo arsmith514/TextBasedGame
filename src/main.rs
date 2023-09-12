@@ -47,7 +47,7 @@ fn title_screen() {
         "Instructions: navigate by typing commands in the terminal (for example: \"go north\")."
     );
     println!("Enter \"i\" to see inventory.");
-    print!("\nPress enter/shift key to begin \n> ");
+    print!("\nPress enter key to begin \n> ");
     io::stdout().flush().unwrap();
     let mut start_input = String::new();
     io::stdin().read_line(&mut start_input).unwrap();
@@ -566,6 +566,7 @@ fn main() {
 
         // get map logic
         if at.room_id == RoomID(2) && !at.map {
+            print!("({} minutes remain)\n> ", at.timer);
             loop {
                 if at.sunscreen {
                     print!("You see a VR headset on the ground - do you try it on? (yes or no) \n>")
@@ -590,6 +591,7 @@ fn main() {
 
         // get UV lamp logic
         if at.room_id == RoomID(4) && !at.sunscreen {
+            print!("({} minutes remain)\n> ", at.timer);
             loop {
                 print!("You see a UV lamp - do you grab it? (yes or no) \n>");
                 io::stdout().flush().unwrap();
@@ -609,6 +611,7 @@ fn main() {
 
         // get social_net logic
         if at.room_id == RoomID(0) && !at.social_net {
+            print!("({} minutes remain)\n> ", at.timer);
             loop {
                 if at.sunscreen {
                     print!("You see a copy of The Social Network - do you grab it? (yes or no) \n>");
@@ -633,6 +636,7 @@ fn main() {
         
         // get data_reg logic
         if at.room_id == RoomID(1) && !at.data_reg {
+            print!("({} minutes remain)\n> ", at.timer);
             loop {
                 if at.sunscreen {
                     print!("You see a printed copy of data privacy regulations - do you grab it? (yes or no) \n>");
@@ -656,6 +660,7 @@ fn main() {
 
         // get spray logic
         if at.room_id == RoomID(5) && !at.spray {
+            print!("({} minutes remain)\n> ", at.timer);
             loop {
                 if at.sunscreen {
                     print!("You see an anti-lizard spray - do you grab it? (yes or no) \n>");
@@ -680,6 +685,7 @@ fn main() {
 
         // get key logic
         if at.room_id == RoomID(3) && !at.key {
+            print!("({} minutes remain)\n> ", at.timer);
             loop {
                 if at.sunscreen {
                     print!("You see a key - do you grab it? (yes or no) \n>");
