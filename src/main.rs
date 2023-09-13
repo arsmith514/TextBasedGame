@@ -137,7 +137,7 @@ fn main() {
 
     let rooms = [
         Room {
-            name: "Start Room".into(), // Turn a &'static string (string constant) into a String
+            name: "The Start\n-----------------------".into(), // Turn a &'static string (string constant) into a String
             desc_light: "You see an entryway to the north, east, and south.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
@@ -182,7 +182,7 @@ fn main() {
             ],
         },
         Room {
-            name: "Whatsapp Room".into(),
+            name: "Whatsapp Room\n-----------------------".into(),
             desc_light: "its light".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
@@ -214,8 +214,8 @@ fn main() {
             ],
         },
         Room {
-            name: "VR Room".into(),
-            desc_light: "its light".into(),
+            name: "VR Room\n-----------------------".into(),
+            desc_light: "Dozens of Oculus headsets are strewn.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
@@ -246,8 +246,8 @@ fn main() {
             ],
         },
         Room {
-            name: "Library".into(),
-            desc_light: "its light".into(),
+            name: "The Library\n-----------------------".into(),
+            desc_light: "Stacks of books line the walls.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
@@ -289,7 +289,7 @@ fn main() {
             ],
         },
         Room {
-            name: "Sunscreen Room".into(),
+            name: "The Sunscreen Room\n-----------------------".into(),
             desc_light: "its light".into(),
             desc_dark: "its dark".into(), // should be same as light cuz has a light
             doors: vec![
@@ -332,8 +332,8 @@ fn main() {
             ],
         },
         Room {
-            name: "End Room".into(),
-            desc_light: "its light".into(),
+            name: "The Final Room\n-----------------------".into(),
+            desc_light: "A final door leads to the south. It's locked. You have a sense there's no turning back after this...".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
@@ -367,8 +367,8 @@ fn main() {
             ],
         },
         Room {
-            name: "Nothing".into(),
-            desc_light: "its light".into(),
+            name: "???\n-----------------------".into(),
+            desc_light: "Doesn't seem to be anything here.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![Door {
                 target: RoomID(4),
@@ -386,7 +386,7 @@ fn main() {
             }],
         },
         Room {
-            name: "BOSS FIGHT".into(),
+            name: "BOSS FIGHT\n-----------------------".into(),
             desc_light: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something against him.".into(),
             desc_dark: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something against him.".into(),
             doors: vec![Door {
@@ -431,7 +431,7 @@ fn main() {
             ],
         },
         Room {
-            name: "BOSS FIGHT".into(),
+            name: "BOSS FIGHT\n-----------------------".into(),
             desc_light: "You show him a copy of the popular 2010s movie, the social network. ZUCK starts groaning in agony.".into(),
             desc_dark: "You show him a copy of the popular 2010s movie, the social network. ZUCK starts groaning in agony.".into(),
             doors: vec![Door {
@@ -463,7 +463,7 @@ fn main() {
         },
         
         Room {
-            name: "BOSS FIGHT".into(),
+            name: "BOSS FIGHT\n-----------------------".into(),
             desc_light: "You spray ZUCK with the lizard repellent. He starts coughing heavily, and falls to his knees.".into(),
             desc_dark: "You spray ZUCK with the lizard repellent. He starts coughing heavily, and falls to his knees.".into(),
             doors: vec![Door {
@@ -497,7 +497,7 @@ fn main() {
             ],
         },
         Room {
-            name: "BOSS FIGHT".into(),
+            name: "BOSS FIGHT\n-----------------------".into(),
             desc_light: "You show ZUCK the data privacy regulations. He scoffs, unaffected. 'These people just submit their data anyway. They 'trust me'. Dumb fucks.'".into(),
             desc_dark: "You show ZUCK the data privacy regulations. He scoffs, unaffected. 'These people just submit their data anyway. They 'trust me'. Dumb fucks.'".into(),
             doors: vec![Door {
@@ -550,6 +550,7 @@ fn main() {
 
 
     title_screen();
+    println!("You wake up, dazed and confused, in complete darkness. The last thing you remember is falling asleep at your job at Meta towards the end of your 80-hour work week. A million questions swirl around your mind, but right now there's only one thing to do. ESCAPE.");
     loop {
         
         // We don't want to move out of rooms, so we take a reference
