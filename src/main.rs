@@ -11,22 +11,22 @@ struct Door {
                            // Any other info about the door would go here
 }
 
-
 #[derive(PartialEq, Eq, Clone, Copy)]
 struct RoomID(usize);
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 struct GameState {
     room_id: RoomID,
-    key: bool, //library
+    key: bool,       //library
     sunscreen: bool, // SS
-    map: bool, // VR
+    map: bool,       // VR
     win: bool,
     timer: usize,
-    boss_hp : usize,
-    spray: bool, // anti lizard spray -- end room
-    data_reg: bool, // data-privacy regulations -- Whatsapp room
+    boss_hp: usize,
+    spray: bool,      // anti lizard spray -- end room
+    data_reg: bool,   // data-privacy regulations -- Whatsapp room
     social_net: bool, // copy of the Social Network -- start
+    searching: bool,
 }
 
 fn title_screen() {
@@ -166,14 +166,26 @@ fn display_inventory(current: GameState) {
     println!("  |___| |_||_|  _\\_/_  \\___| |_||_|  _\\__|  \\___/  _|_|_  _|__/  ");
     println!("_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_| \"\"\"\"| ");
     println!("\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-` \n");
-    if current.data_reg {println!("   * data-privacy regulations");}
-    if current.key {println!("   * key");}
-    if current.map {println!("   * map");}
-    if current.social_net {println!("   * The Social Network");}
-    if current.spray {println!("   * anti-lizard spray");}
-    if current.sunscreen {println!("   * UV lamp");}
-   
-    println!("")
+    if current.data_reg {
+        println!("   * data-privacy regulations");
+    }
+    if current.key {
+        println!("   * key");
+    }
+    if current.map {
+        println!("   * map");
+    }
+    if current.social_net {
+        println!("   * The Social Network");
+    }
+    if current.spray {
+        println!("   * anti-lizard spray");
+    }
+    if current.sunscreen {
+        println!("   * UV lamp");
+    }
+
+    println!("\n")
 }
 fn main() {
     use std::io;
@@ -444,8 +456,8 @@ fn main() {
         },
         Room {
             name: "BOSS FIGHT\n-----------------------".into(),
-            desc_light: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something against him.".into(),
-            desc_dark: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something against him.".into(),
+            desc_light: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something in the inventory against him.".into(),
+            desc_dark: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something in the inventory against him.".into(),
             doors: vec![Door {
                 target: RoomID(8),
                 triggers: vec![
@@ -469,6 +481,7 @@ fn main() {
                     "use the spray".into(),
                     "spray him".into(),
                     "lizard spray".into(),
+                    "anti-lizard spray".into(),
                 ],
                 message: None,
             },
@@ -482,6 +495,11 @@ fn main() {
                     "use data privacy regulations".into(),
                     "use the data privacy regulations".into(),
                     "show the data privacy regulations".into(),
+                    "use data-privacy regulations".into(),
+                    "use the data-privacy regulations".into(),
+                    "show the data-privacy regulations".into(),
+                    "data-privacy".into(),
+                    "data privacy".into(),
                 ],
                 message: None,
             },
@@ -518,7 +536,6 @@ fn main() {
             },
             ],
         },
-        
         Room {
             name: "BOSS FIGHT\n-----------------------".into(),
             desc_light: "You spray ZUCK with the lizard repellent. He starts coughing heavily, and falls to his knees.".into(),
@@ -585,13 +602,11 @@ fn main() {
             },
             ],
         },
-        
     ];
 
     let end_rooms = [RoomID(8), RoomID(9)];
     let mut input = String::new();
 
-   
     let mut at: GameState = GameState {
         room_id: RoomID(0),
         key: false,
@@ -600,17 +615,16 @@ fn main() {
         win: false,
         timer: 20,
         boss_hp: 2,
-        spray: false, // anti lizard spray
-        data_reg: false, // data-privacy regulations
-        social_net: false // copy of the Social Network
+        spray: false,      // anti lizard spray
+        data_reg: false,   // data-privacy regulations
+        social_net: false, // copy of the Social Network
+        searching: false,
     };
 
-
     title_screen();
-    
+
     println!("You wake up, dazed and confused, in complete darkness. The last thing you remember is falling asleep at your job at Meta towards the end of your 80-hour work week. A million questions swirl around your mind, but right now there's only one thing to do. ESCAPE.");
     loop {
-        
         // We don't want to move out of rooms, so we take a reference
         let here = &rooms[at.room_id.0];
         if !at.sunscreen {
@@ -619,44 +633,77 @@ fn main() {
             println!("{}\n{}", here.name, here.desc_light);
         }
 
-        if at.map && (at.room_id.0 != 7) && (at.room_id.0 != 8) && (at.room_id.0 != 9) && (at.room_id.0 != 10) {
+        if at.map
+            && (at.room_id.0 != 7)
+            && (at.room_id.0 != 8)
+            && (at.room_id.0 != 9)
+            && (at.room_id.0 != 10)
+        {
             make_map(at.room_id);
         }
-        
 
         // get map logic
         if at.room_id == RoomID(2) && !at.map {
             print!("({} minutes remain)\n> ", at.timer);
+            let mut end = false;
             loop {
-                if at.sunscreen {
-                    print!("You see a VR headset on the ground - do you try it on? (yes or no) \n>")
+                if (at.searching && !at.map) || at.sunscreen {
+                    loop {
+                        if at.sunscreen {
+                            print!("You see a VR headset on the ground - do you try it on? (yes or no) \n> ")
+                        } else {
+                            print!("As you crawl around, you feel some kind of headset - do you try it on? (yes or no) \n> ");
+                        }
+                        io::stdout().flush().unwrap();
+                        let mut try_vr = String::new();
+                        io::stdin().read_line(&mut try_vr).unwrap();
+                        let try_vr = try_vr.trim();
+                        if try_vr == "yes" {
+                            at.map = true;
+                            println!("With the headset on, you see a map with your current location in AR! Turns out all the other features are locked in beta, but this will at least make things a little easier.");
+                            make_map(at.room_id);
+                            end = true;
+                            break;
+                        } else if try_vr == "no" {
+                            end = true;
+                            break;
+                        } else if try_vr == "i" {
+                            display_inventory(at)
+                        } else {
+                            println!("You can't do that.")
+                        }
+                    }
                 } else {
-                    print!("As you crawl around, you feel some kind of headset - do you try it on? (yes or no) \n>"); 
+                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
+                    io::stdout().flush().unwrap();
+                    let mut crawl = String::new();
+                    io::stdin().read_line(&mut crawl).unwrap();
+                    let crawl = crawl.trim();
+                    if crawl == "yes" {
+                        at.timer -= 2;
+                        at.searching = true;
+                    } else if crawl == "no" {
+                        end = true;
+                        break;
+                    } else if crawl == "i" {
+                        display_inventory(at)
+                    } else {
+                        println!("You can't do that.")
+                    }
                 }
-                io::stdout().flush().unwrap();
-                let mut try_vr = String::new();
-                io::stdin().read_line(&mut try_vr).unwrap();
-                let try_vr = try_vr.trim();
-                if try_vr == "yes" {
-                    at.map = true;
-                    println!("With the headset on, you see a map with your current location in AR! Turns out all the other features are locked in beta, but this will at least make things a little easier.");
-                    make_map(at.room_id);
+                if end {
                     break;
-                }
-                if try_vr == "no" {
-                    break;
-                }
-                if try_vr == "i" {
-                    display_inventory(at)
                 }
             }
+            at.searching = false;
         }
 
         // get UV lamp logic
         if at.room_id == RoomID(4) && !at.sunscreen {
             print!("({} minutes remain)\n> ", at.timer);
+            let mut end = false;
             loop {
-                print!("You see a UV lamp - do you grab it? (yes or no) \n>");
+                print!("You see a UV lamp - do you grab it? (yes or no) \n> ");
                 io::stdout().flush().unwrap();
                 let mut try_ss = String::new();
                 io::stdin().read_line(&mut try_ss).unwrap();
@@ -665,12 +712,12 @@ fn main() {
                     at.sunscreen = true;
                     println!("The lamp reveals the entire room with all its doorways, oddly enough lathered in sunscreen. With this, you'll have a much easier time getting around.");
                     break;
-                }
-                if try_ss == "no" {
+                } else if try_ss == "no" {
                     break;
-                }
-                if try_ss == "i" {
+                } else if try_ss == "i" {
                     display_inventory(at)
+                } else {
+                    println!("You can't do that.")
                 }
             }
         }
@@ -678,116 +725,227 @@ fn main() {
         // get social_net logic
         if at.room_id == RoomID(0) && !at.social_net {
             print!("({} minutes remain)\n> ", at.timer);
+            let mut end = false;
             loop {
-                if at.sunscreen {
-                    print!("You see a copy of The Social Network - do you grab it? (yes or no) \n>");
+                if (at.searching && !at.social_net) || at.sunscreen {
+                    loop {
+                        if at.sunscreen {
+                            print!("You see a copy of The Social Network - do you grab it? (yes or no) \n> ");
+                        } else {
+                            print!("As you search around, you feel a DVD case. It feels like The Social Network... - do you grab it? (yes or no) \n> ");
+                        }
+                        io::stdout().flush().unwrap();
+                        let mut try_vr = String::new();
+                        io::stdin().read_line(&mut try_vr).unwrap();
+                        let try_vr = try_vr.trim();
+                        if try_vr == "yes" {
+                            at.social_net = true;
+                            println!("You stuff it in your bag.");
+                            end = true;
+                            break;
+                        } else if try_vr == "no" {
+                            end = true;
+                            break;
+                        } else if try_vr == "i" {
+                            display_inventory(at)
+                        } else {
+                            println!("You can't do that.")
+                        }
+                    }
                 } else {
-                    print!("As you search around, you feel a DVD case. It feels like The Social Network... - do you grab it? (yes or no) \n>")
+                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
+                    io::stdout().flush().unwrap();
+                    let mut crawl = String::new();
+                    io::stdin().read_line(&mut crawl).unwrap();
+                    let crawl = crawl.trim();
+                    if crawl == "yes" {
+                        at.timer -= 2;
+                        at.searching = true;
+                    } else if crawl == "no" {
+                        end = true;
+                        break;
+                    } else if crawl == "i" {
+                        display_inventory(at)
+                    } else {
+                        println!("You can't do that.")
+                    }
                 }
-                
-                io::stdout().flush().unwrap();
-                let mut try_ss = String::new();
-                io::stdin().read_line(&mut try_ss).unwrap();
-                let try_ss = try_ss.trim();
-                if try_ss == "yes" {
-                    at.social_net = true;
-                    println!("You stuff it in your bag.");
+                if end {
                     break;
-                }
-                if try_ss == "no" {
-                    break;
-                }
-                if try_ss == "i" {
-                    display_inventory(at)
                 }
             }
+            at.searching = false;
         }
-        
+
         // get data_reg logic
         if at.room_id == RoomID(1) && !at.data_reg {
             print!("({} minutes remain)\n> ", at.timer);
+            let mut end = false;
             loop {
-                if at.sunscreen {
-                    print!("You see a printed copy of data privacy regulations - do you grab it? (yes or no) \n>");
+                if (at.searching && !at.data_reg) || at.sunscreen {
+                    loop {
+                        if at.sunscreen {
+                            print!("You see a printed copy of data privacy regulations - do you grab it? (yes or no) \n> ");
+                        } else {
+                            print!("You feel a large stack of paper. Zuck has been reading about data privacy regulations recently... - do you grab it? (yes or no) \n> ");
+                        }
+                        io::stdout().flush().unwrap();
+                        let mut try_vr = String::new();
+                        io::stdin().read_line(&mut try_vr).unwrap();
+                        let try_vr = try_vr.trim();
+                        if try_vr == "yes" {
+                            at.data_reg = true;
+                            println!("You stuff it in your bag.");
+                            end = true;
+                            break;
+                        } else if try_vr == "no" {
+                            end = true;
+                            break;
+                        } else if try_vr == "i" {
+                            display_inventory(at)
+                        } else {
+                            println!("You can't do that.")
+                        }
+                    }
                 } else {
-                    print!("You feel a large stack of paper. Zuck has been reading about data privacy regulations recently... - do you grab it? (yes or no) \n>");
+                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
+                    io::stdout().flush().unwrap();
+                    let mut crawl = String::new();
+                    io::stdin().read_line(&mut crawl).unwrap();
+                    let crawl = crawl.trim();
+                    if crawl == "yes" {
+                        at.timer -= 2;
+                        at.searching = true;
+                    } else if crawl == "no" {
+                        end = true;
+                        break;
+                    } else if crawl == "i" {
+                        display_inventory(at)
+                    } else {
+                        println!("You can't do that.")
+                    }
                 }
-                io::stdout().flush().unwrap();
-                let mut try_ss = String::new();
-                io::stdin().read_line(&mut try_ss).unwrap();
-                let try_ss = try_ss.trim();
-                if try_ss == "yes" {
-                    at.data_reg = true;
-                    println!("You stuff it in your bag.");
+                if end {
                     break;
-                }
-                if try_ss == "no" {
-                    break;
-                }
-                if try_ss == "i" {
-                    display_inventory(at)
                 }
             }
+            at.searching = false;
         }
 
         // get spray logic
         if at.room_id == RoomID(5) && !at.spray {
             print!("({} minutes remain)\n> ", at.timer);
+            let mut end = false;
             loop {
-                if at.sunscreen {
-                    print!("You see an anti-lizard spray - do you grab it? (yes or no) \n>");
+                if (at.searching && !at.spray) || at.sunscreen {
+                    loop {
+                        if at.sunscreen {
+                            print!(
+                                "You see an anti-lizard spray - do you grab it? (yes or no) \n> "
+                            );
+                        } else {
+                            print!("You feel a canister... a spray... it could be for lizards... - do you grab it? (yes or no) \n> ");
+                        }
+                        io::stdout().flush().unwrap();
+                        let mut try_vr = String::new();
+                        io::stdin().read_line(&mut try_vr).unwrap();
+                        let try_vr = try_vr.trim();
+                        if try_vr == "yes" {
+                            at.spray = true;
+                            println!("You stuff it in your bag.");
+                            end = true;
+                            break;
+                        } else if try_vr == "no" {
+                            end = true;
+                            break;
+                        } else if try_vr == "i" {
+                            display_inventory(at)
+                        } else {
+                            println!("You can't do that.")
+                        }
+                    }
                 } else {
-                    print!("You feel a canister... a spray... it could be for lizards... - do you grab it? (yes or no) \n>");
+                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
+                    io::stdout().flush().unwrap();
+                    let mut crawl = String::new();
+                    io::stdin().read_line(&mut crawl).unwrap();
+                    let crawl = crawl.trim();
+                    if crawl == "yes" {
+                        at.timer -= 2;
+                        at.searching = true;
+                    } else if crawl == "no" {
+                        end = true;
+                        break;
+                    } else if crawl == "i" {
+                        display_inventory(at)
+                    } else {
+                        println!("You can't do that.")
+                    }
                 }
-                
-                io::stdout().flush().unwrap();
-                let mut try_ss = String::new();
-                io::stdin().read_line(&mut try_ss).unwrap();
-                let try_ss = try_ss.trim();
-                if try_ss == "yes" {
-                    at.spray = true;
-                    println!("You stuff it in your bag.");
+                if end {
                     break;
-                }
-                if try_ss == "no" {
-                    break;
-                }
-                if try_ss == "i" {
-                    display_inventory(at)
                 }
             }
-        } 
+            at.searching = false;
+        }
 
         // get key logic
         if at.room_id == RoomID(3) && !at.key {
             print!("({} minutes remain)\n> ", at.timer);
+            let mut end = false;
             loop {
-                if at.sunscreen {
-                    print!("You see a key - do you grab it? (yes or no) \n>");
+                if (at.searching && !at.key) || at.sunscreen {
+                    loop {
+                        if at.sunscreen {
+                            print!("You see a key - do you grab it? (yes or no) \n> ");
+                        } else {
+                            print!("You nearly trip over a key - do you grab it? (yes or no) \n> ");
+                        }
+                        io::stdout().flush().unwrap();
+                        let mut try_vr = String::new();
+                        io::stdin().read_line(&mut try_vr).unwrap();
+                        let try_vr = try_vr.trim();
+                        if try_vr == "yes" {
+                            at.key = true;
+                            println!("You stuff it in your bag.");
+                            end = true;
+                            break;
+                        } else if try_vr == "no" {
+                            end = true;
+                            break;
+                        } else if try_vr == "i" {
+                            display_inventory(at)
+                        } else {
+                            println!("You can't do that.")
+                        }
+                    }
                 } else {
-                    print!("You nearly trip over a key - do you grab it? (yes or no) \n>");
+                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
+                    io::stdout().flush().unwrap();
+                    let mut crawl = String::new();
+                    io::stdin().read_line(&mut crawl).unwrap();
+                    let crawl = crawl.trim();
+                    if crawl == "yes" {
+                        at.timer -= 2;
+                        at.searching = true;
+                    } else if crawl == "no" {
+                        end = true;
+                        break;
+                    } else if crawl == "i" {
+                        display_inventory(at)
+                    } else {
+                        println!("You can't do that.")
+                    }
                 }
-                io::stdout().flush().unwrap();
-                let mut try_ss = String::new();
-                io::stdin().read_line(&mut try_ss).unwrap();
-                let try_ss = try_ss.trim();
-                if try_ss == "yes" {
-                    at.key = true;
-                    println!("You stuff it in your bag.");
+                if end {
                     break;
-                }
-                if try_ss == "no" {
-                    break;
-                }
-                if try_ss == "i" {
-                    display_inventory(at)
                 }
             }
+            at.searching = false;
         }
 
-        
         loop {
-            print!("What will you do?\n");
+            print!("What will you do?\n> ");
             print!("({} minutes remain)\n> ", at.timer);
             io::stdout().flush().unwrap();
             input.clear();
@@ -797,50 +955,52 @@ fn main() {
                 display_inventory(at);
             } else {
                 if let Some(door) = here
-                .doors
-                .iter()
-                .find(|d| d.triggers.iter().any(|t| *t == input))
-            {
-                if let Some(msg) = &door.message {
-                    println!("{}", msg);
-                }
-                at.room_id = door.target;
-                at.timer -= 1;
-                if at.room_id.0 == 7 {
-                    print_zuck();
-                }
-                break;
-            } else {
-                at.timer -=1;
-                if at.timer == 0{
+                    .doors
+                    .iter()
+                    .find(|d| d.triggers.iter().any(|t| *t == input))
+                {
+                    if let Some(msg) = &door.message {
+                        println!("{}", msg);
+                    }
+                    at.room_id = door.target;
+                    at.timer -= 1;
+                    if at.room_id.0 == 7 {
+                        print_zuck();
+                    }
                     break;
+                } else {
+                    at.timer -= 1;
+                    if at.timer == 0 {
+                        break;
+                    }
+                    println!("That doesn't seem to work, unfortunately. Your breathing starts to get more labored.");
                 }
-                println!("That doesn't seem to work, unfortunately. Your breathing starts to get more labored.");
             }
-            }
-            
         }
         if end_rooms.contains(&at.room_id) {
-            at.boss_hp -=1;
+            at.boss_hp -= 1;
             if at.boss_hp == 0 {
                 let here = &rooms[at.room_id.0];
                 println!("{}\n{}", here.name, here.desc_light);
                 at.win = true;
             }
         }
-        if at.win == true {
+        if at.win {
             break;
         }
         if at.timer == 0 {
             break;
         }
     }
-    if at.win == true{
+    if at.win {
+        println!("Zuck collapses. You rush out the exit.");
         println!("You see a blinding light...as you step forward you emerge onto the sunny streets of Menlo Park. A new, yet uncertain future awaits for you.");
+        println!("You win");
         println!("THE END");
     }
-    if at.win == false {
+    if !at.win {
         println!("You collapse to the ground, out of breath. As your vision starts to fade, you see ZUCK crouching over you, smiling. The last words you hear are: 'unfortnately there's going to be another around of layoffs...'");
-        println!("THE END");
+        println!("You loose");
+        println!("THE END");  
     }
 }
