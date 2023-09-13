@@ -1,21 +1,40 @@
-struct Room {
+use std::io;
+use std::io::Write;
+
+use crate::rooms::get_rooms;
+use crate::displays::print_zuck;
+use crate::displays::title_screen;
+use crate::displays::make_map;
+use crate::displays::display_inventory;
+mod rooms;
+mod displays;
+
+pub struct Room {
     name: String,       // E.g. "Antechamber"
     desc_light: String, // E.g. "Dark wood paneling covers the walls.  The gilded northern doorway lies open."
     desc_dark: String,
     doors: Vec<Door>,
 }
-struct Door {
+pub struct Door {
     target: RoomID,        // More about this in a minute
     triggers: Vec<String>, // e.g. "go north", "north"
     message: Option<String>, // What message, if any, to print when the doorway is traversed
                            // Any other info about the door would go here
 }
 
-#[derive(PartialEq, Eq, Clone, Copy)]
-struct RoomID(usize);
+#[derive(PartialEq, Eq, Clone)]
+pub struct Item {
+    name: String,
+    light_desc: String,
+    dark_desc: String,
+    pick_up_text: String,
+}
 
 #[derive(PartialEq, Eq, Clone, Copy)]
-struct GameState {
+pub struct RoomID(usize);
+
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub struct GameState {
     room_id: RoomID,
     key: bool,       //library
     sunscreen: bool, // SS
@@ -29,169 +48,6 @@ struct GameState {
     searching: bool,
 }
 
-fn title_screen() {
-    use std::io;
-    // We need the Write trait so we can flush stdout
-    use std::io::Write;
-    println!();
-    println!("██ ███╗   █████████╗██████╗   ██████████╗  ██ ███████╗   ███╗   ███ ██████████████╗█████╗██╗   █████████ ██████╗ ███████ ███████╗");
-    println!("██ ████╗  ██╚═██╔══██╔═══██╗  ╚══██╔══██║  ██ ██╔════╝   ████╗ ████ ██╔════╚═██╔══██╔══████║   ████╔════ ██╔══██ ██╔════ ██╔════╝");
-    println!("██ ██╔██╗ ██║ ██║  ██║   ██║     ██║  ███████ █████╗     ██╔████╔██ █████╗   ██║  █████████║   ███████╗  ██████╔ ███████ █████╗");
-    println!("██ ██║╚██╗██║ ██║  ██║   ██║     ██║  ██╔══██ ██╔══╝     ██║╚██╔╝██ ██╔══╝   ██║  ██╔══██╚██╗ ██╔██╔══╝  ██╔══██ ╚════██ ██╔══╝");
-    println!("██ ██║ ╚████║ ██║  ╚██████╔╝     ██║  ██║  ██ ███████╗   ██║ ╚═╝ ██ ███████╗ ██║  ██║  ██║╚████╔╝███████ ██║  ██ ███████ ███████╗");
-    println!("██ ██║ ╚████║ ██║  ╚██████╔╝     ██║  ██║  ██ ███████╗   ██║ ╚═╝ ██ ███████╗ ██║  ██║  ██║╚████╔╝███████ ██║  ██ ███████ ███████╗");
-    println!("╚═ ╚═╝  ╚═══╝ ╚═╝   ╚═════╝      ╚═╝  ╚═╝  ╚═ ╚══════╝   ╚═╝     ╚═ ╚══════╝ ╚═╝  ╚═╝  ╚═╝ ╚═══╝ ╚══════ ╚═╝  ╚═ ╚══════ ╚══════╝");
-    println!();
-
-    println!(
-        "Instructions: navigate by typing commands in the terminal (for example: \"go north\")."
-    );
-    println!("Enter \"i\" to see inventory.");
-    print!("\nPress enter key to begin \n> ");
-    io::stdout().flush().unwrap();
-    let mut start_input = String::new();
-    io::stdin().read_line(&mut start_input).unwrap();
-}
-fn print_zuck() {
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%##***++*##*##*++*#%%%%%%%####%@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%#**##**##%%%%#####%%%%%%%##****#@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%####%###+#%%####%%%%###%%%#**###**%@@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%##%%#**##*++*##**##******###%%%####*+*#%@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%%%%%%%##++*++=====++**+*****###*++*@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%#%##*=-====---------==++++===+*###%#**#@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%@%#*+==---::::::::::::::--::::::-===++*%##**#@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%@@@%#*====-----:::::::::::::::::::::::-:-=*#***#%@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%@@@%#*+=====-------::::::::::::::::::::::::-=**###%@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%@%%#**+=====--------::::::::::::::::::::::::-=*##%%%@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%@@%###*++==-----------:::::::::::::::::::::::--+**##%@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%###**+==-----------::::::::::::::::::::::----+*##%@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%###**+==-----------::::::::::::::::::::::----=**#@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%##**+===----:::::::::::::::::::::::::::------++#%@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%##*+==-----::::::::::::::::::::::::::::-----++#%@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%##*+==-----:::::::::::::::::....:::::::----=+*#%@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%@@%%###**+++++++===----::::::::::::::::::::----+*#%%@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%###*+=-==++****+==-------=========-------=*##%@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%@@@@@%%%###*++=====+++##*+-:::--=======---::-==--=###%%@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%@@@%###########**=+*+*##+-:.::-==++***+==--::---=#%###@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%@%%#########***+:-+++**=:..:::-=+++*#++=++=:---=##=-*@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%@%###*####+==-::----+**=::::::::--=+++=-==+-::-=**==*@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%@%##***++===-----:-=+**=:::::::::-==--:::-::::-=*=--+%@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%##**+=======----=+***-:::::::::--::--:::::::-=+=-=+%@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%##*+=--::------=+**#*-::::::::::::::::::::::-+*=-=#@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%##*+==--:::----=**##*=:.:::::::::::::::::::-=++==*@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%##*+=---::---==*##*+=:::::::::::::::::::::-=-=-=%@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%##*+=--------=+***+--::.:::::::::::::::::--=---*@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%#*+==------==****=-::..:::::::::::::::::-==--+%@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%##*==------=*%%%#*+--::::::::---:::::::--=--+%@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%##*+==----=*#%%%@@%#*==+++-:::---::::::--=-=%@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%#*+==---=+#%%%%%%##*+---::::::--:::::---+%@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%#+======*####*++===--:::::::----:::----#@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%#+=--=+*#####**+=-::::::::::-==-::----+@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%#*=-:-=*#%%%@%%##*+++++++++====-:-----#@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%#+-::=++**#*++++*+++===-:::---::----*@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%#*=-:=++****+=--------:::::---:----+@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%#+=--++****++===---::::::::----=-=%@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%#*++===+****++=====-::::::::-=--=%@@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%##*==-==+++++++==--:::::::---===%@@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%#+==---------:::::::::---==+-*@@@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%%#++=----::-:::::::::--==++=-%@@@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%%%%#**=---:---::::::---=+++=-=@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%%%%%%%##*=---==-----==+++++=--+#@@@@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%%%%%%%%%%%%%#*+++++++++**+++===-=++*%%@@@@@@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%#######%%%%%%%%%%%%%###*++====---=*+++**##%%@@@@@@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@@@@%%%%@@@@@@@@@%%%%%%#########%%%%%%%%%%#*+=--====----+**++*******##%%@@@@@@@@@@@@@");
-    println!("@@@@@@@@@@@@@@@@%%%%%%%%%%%@@@@@@%%%%##################%#*==--====----=#***+*******##****##%%@@@@@@@");
-    println!("@@@@@@@@@@@@@%%%%%%#%%%%%%%%%@@@@%%%%#########*********###*+==--------=##**********###*********##%@@");
-    println!("@@@@@@@@@@@@%%%###%%##%%%%%%%%@@@@%%%######**+++++++++++*#*+=---------=#**************************#*");
-    println!("@@@@%%%%%%%%%%#####%####%%%%%%%%@@@%######**++=====++=======---------==*********#***##************##");
-    println!("@%%%%%%%%%%%%##############%%##%%%%%%###****++======++===------==-====*****+********##****##*****#*#");
-    println!("%%%##%%%#%%%#####################%%%%%%#*****++==-===++++===========+****************#****##******##");
-    println!("%%#####%###%#######################%%%%%%#*+++++==-===++++====---==+**#*************##****#*#****###");
-    println!("%#######################*****########%%%%%%#**++==---==++===----=+*****+++**********##****#******##*");
-}
-
-fn make_map(room: RoomID) {
-    println!("                        ###### ______");
-    if room == RoomID(1) {
-        println!("                        # *W #       ||");
-    } else {
-        println!("                        # W  #       ||");
-    }
-    println!("                        ######      ###### ");
-
-    if room == RoomID(2) {
-        println!("                          ||        # *VR# ");
-    } else {
-        println!("                          ||        # VR # ");
-    }
-    println!("                        ######      ###### ");
-    if room == RoomID(0) {
-        println!("                        # *S # ______||");
-    } else {
-        println!("                        # S  # ______||");
-    }
-    println!("                        ######");
-    println!("                          ||  ");
-    println!("######______######______######");
-
-    if room == RoomID(3) {
-        println!("# E  #______# SS #______# *L #");
-    } else if room == RoomID(4) {
-        println!("# E  #______# *SS#______# L  #");
-    } else if room == RoomID(5) {
-        println!("# *E #______# SS #______# L  #");
-    } else {
-        println!("# E  #______# SS #______# L  #");
-    }
-    println!("######      ######      ######");
-    if room == RoomID(6) {
-        println!(" | |         |*|");
-    } else {
-        println!(" | |         | |");
-    }
-
-    println!("######      ######");
-    if room == RoomID(7) {
-        println!("# *B #");
-    } else {
-        println!("# B  #");
-    }
-    println!("######");
-}
-
-fn display_inventory(current: GameState) {
-    println!("   ___                                _                    _  _ ");
-    println!("  |_ _|  _ _    __ __   ___   _ _    | |_    ___     _ _  | || | ");
-    println!("   | |  | ' \\   \\ V /  / -_) | ' \\   |  _|  / _ \\   | '_|  \\_, | ");
-    println!("  |___| |_||_|  _\\_/_  \\___| |_||_|  _\\__|  \\___/  _|_|_  _|__/  ");
-    println!("_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_|\"\"\"\"\"_| \"\"\"\"| ");
-    println!("\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-\"`-0-0-` \n");
-    if current.data_reg {
-        println!("   * data-privacy regulations");
-    }
-    if current.key {
-        println!("   * key");
-    }
-    if current.map {
-        println!("   * map");
-    }
-    if current.social_net {
-        println!("   * The Social Network");
-    }
-    if current.spray {
-        println!("   * anti-lizard spray");
-    }
-    if current.sunscreen {
-        println!("   * UV lamp");
-    }
-
-    println!("\n")
-}
-fn main() {
-    use std::io;
-    // We need the Write trait so we can flush stdout
-    use std::io::Write;
-
     // room 0 = Start??
     // room 1 = Whatsapp
     // room 2 = VR
@@ -204,405 +60,72 @@ fn main() {
     // room 9 = use lizard spray in battle
     // room 10 = use data privacy regulations in battle
 
-    let rooms = [
-        Room {
-            name: "The Start\n-----------------------".into(), // Turn a &'static string (string constant) into a String
-            desc_light: "You see an entryway to the north, east, and south.".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
-            doors: vec![
-                Door {
-                    target: RoomID(1),
-                    triggers: vec![
-                        "north".into(),
-                        "up".into(),
-                        "go up".into(),
-                        "go north".into(),
-                        "whatsapp room".into(),
-                        "whatsapp.()".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-                Door {
-                    target: RoomID(2),
-                    triggers: vec![
-                        "east".into(),
-                        "right".into(),
-                        "go right".into(),
-                        "VR".into(),
-                        "go east".into(),
-                        "VR room".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-                Door {
-                    target: RoomID(3),
-                    triggers: vec![
-                        "south".into(),
-                        "go south".into(),
-                        "down".into(),
-                        "go down".into(),
-                        "library".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-            ],
-        },
-        Room {
-            name: "Whatsapp Room\n-----------------------".into(),
-            desc_light: "its light".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
-            doors: vec![
-                Door {
-                    target: RoomID(0),
-                    triggers: vec![
-                        "start".into(),
-                        "south".into(),
-                        "go south".into(),
-                        "down".into(),
-                        "go down".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-                Door {
-                    target: RoomID(2),
-                    triggers: vec![
-                        "east".into(),
-                        "go east".into(),
-                        "right".into(),
-                        "go right".into(),
-                        "VR room".into(),
-                        "VR".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-            ],
-        },
-        Room {
-            name: "VR Room\n-----------------------".into(),
-            desc_light: "Dozens of Oculus headsets are strewn.".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
-            doors: vec![
-                Door {
-                    target: RoomID(0),
-                    triggers: vec![
-                        "south".into(),
-                        "go south".into(),
-                        "down".into(),
-                        "go down".into(),
-                        "start".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-                Door {
-                    target: RoomID(1),
-                    triggers: vec![
-                        "north".into(),
-                        "go north".into(),
-                        "up".into(),
-                        "go up".into(),
-                        "whatsapp room".into(),
-                        "whatsapp".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-            ],
-        },
-        Room {
-            name: "The Library\n-----------------------".into(),
-            desc_light: "Stacks of books line the walls.".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
-            doors: vec![
-                Door {
-                    target: RoomID(0),
-                    triggers: vec![
-                        "north".into(),
-                        "go north".into(),
-                        "up".into(),
-                        "go up".into(),
-                        "start".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-                Door {
-                    target: RoomID(4),
-                    triggers: vec![
-                        "west".into(),
-                        "go west".into(),
-                        "left".into(),
-                        "go left".into(),
-                        "sunscreen room".into(),
-                        "sun screen".into(),
-                        "sunscreen".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-                Door {
-                    target: RoomID(6),
-                    triggers: vec![
-                        "go south".into(),
-                        "south".into(),
-                        "nothing".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-            ],
-        },
-        Room {
-            name: "The Sunscreen Room\n-----------------------".into(),
-            desc_light: "its light".into(),
-            desc_dark: "its dark".into(), // should be same as light cuz has a light
-            doors: vec![
-                Door {
-                    target: RoomID(3),
-                    triggers: vec![
-                        "east".into(),
-                        "go east".into(),
-                        "right".into(),
-                        "go right".into(),
-                        "library".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-                Door {
-                    target: RoomID(5),
-                    triggers: vec![
-                        "west".into(),
-                        "go west".into(),
-                        "left".into(),
-                        "go left".into(),
-                        "end".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-                Door {
-                    target: RoomID(6),
-                    triggers: vec![
-                        "south".into(),
-                        "go south".into(),
-                        "down".into(),
-                        "go down".into(),
-                        "nothing".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-            ],
-        },
-        Room {
-            name: "The Final Room\n-----------------------".into(),
-            desc_light: "A final door leads to the south. It's locked. You have a sense there's no turning back after this...".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
-            doors: vec![
-                Door {
-                    target: RoomID(4),
-                    triggers: vec![
-                        "go back".into(),
-                        "right".into(),
-                        "go right".into(),
-                        "east".into(),
-                        "go east".into(),
-                        "sunscreen".into(),
-                        "sun screen".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-                Door {
-                    target: RoomID(7),
-                    triggers: vec![
-                        "end".into(),
-                        "use key".into(),
-                        "key".into(),
-                        "south".into(),
-                        "go south".into(),
-                        "down".into(),
-                        "go down".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                },
-            ],
-        },
-        Room {
-            name: "???\n-----------------------".into(),
-            desc_light: "Doesn't seem to be anything here.".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
-            doors: vec![Door {
-                target: RoomID(4),
-                triggers: vec![
-                    "turn around".into(),
-                    "go up".into(),
-                    "up".into(),
-                    "north".into(),
-                    "go north".into(),
-                    "go back".into(),
-                    "back".into(),
-                    "library".into(),
-                ],
-                message: None,
-            }],
-        },
-        Room {
-            name: "BOSS FIGHT\n-----------------------".into(),
-            desc_light: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something in the inventory against him.".into(),
-            desc_dark: "You hear a hiss: 'I think it's time for an employee review.' ZUCK appears, blocking your path. There's no turning back now, you have to use something in the inventory against him.".into(),
-            doors: vec![Door {
-                target: RoomID(8),
-                triggers: vec![
-                    "use movie".into(),
-                    "movie".into(),
-                    "the social network".into(),
-                    "show movie".into(),
-                    "show social network".into(),
-                    "use social network".into(),
-                    "use the movie".into(),
-                    "show the social network".into(),
-                    "use the social network".into(),
-                ],
-                message: None,
-            }, Door {
-                target: RoomID(9),
-                triggers: vec![
-                    "use lizard spray".into(),
-                    "spray".into(),
-                    "use spray".into(),
-                    "use the spray".into(),
-                    "spray him".into(),
-                    "lizard spray".into(),
-                    "anti-lizard spray".into(),
-                ],
-                message: None,
-            },
-            Door {
-                target: RoomID(10),
-                triggers: vec![
-                    "use regulations".into(),
-                    "regulations".into(),
-                    "show regulations".into(),
-                    "show the regulations".into(),
-                    "use data privacy regulations".into(),
-                    "use the data privacy regulations".into(),
-                    "show the data privacy regulations".into(),
-                    "use data-privacy regulations".into(),
-                    "use the data-privacy regulations".into(),
-                    "show the data-privacy regulations".into(),
-                    "data-privacy".into(),
-                    "data privacy".into(),
-                ],
-                message: None,
-            },
-            ],
-        },
-        Room {
-            name: "BOSS FIGHT\n-----------------------".into(),
-            desc_light: "You show him a copy of the popular 2010s movie, the social network. ZUCK starts groaning in agony.".into(),
-            desc_dark: "You show him a copy of the popular 2010s movie, the social network. ZUCK starts groaning in agony.".into(),
-            doors: vec![Door {
-                target: RoomID(9),
-                triggers: vec![
-                    "use lizard spray".into(),
-                    "spray".into(),
-                    "use spray".into(),
-                    "use the spray".into(),
-                    "spray him".into(),
-                    "lizard spray".into(),
-                ],
-                message: None,
-            },
-            Door {
-                target: RoomID(10),
-                triggers: vec![
-                    "use regulations".into(),
-                    "regulations".into(),
-                    "show regulations".into(),
-                    "show the regulations".into(),
-                    "use data privacy regulations".into(),
-                    "use the data privacy regulations".into(),
-                    "show the data privacy regulations".into(),
-                ],
-                message: None,
-            },
-            ],
-        },
-        Room {
-            name: "BOSS FIGHT\n-----------------------".into(),
-            desc_light: "You spray ZUCK with the lizard repellent. He starts coughing heavily, and falls to his knees.".into(),
-            desc_dark: "You spray ZUCK with the lizard repellent. He starts coughing heavily, and falls to his knees.".into(),
-            doors: vec![Door {
-                target: RoomID(8),
-                triggers: vec![
-                    "use movie".into(),
-                    "movie".into(),
-                    "the social network".into(),
-                    "show movie".into(),
-                    "show social network".into(),
-                    "use social network".into(),
-                    "use the movie".into(),
-                    "show the social network".into(),
-                    "use the social network".into(),
-                ],
-                message: None,
-            },
-            Door {
-                target: RoomID(10),
-                triggers: vec![
-                    "use regulations".into(),
-                    "regulations".into(),
-                    "show regulations".into(),
-                    "show the regulations".into(),
-                    "use data privacy regulations".into(),
-                    "use the data privacy regulations".into(),
-                    "show the data privacy regulations".into(),
-                ],
-                message: None,
-            },
-            ],
-        },
-        Room {
-            name: "BOSS FIGHT\n-----------------------".into(),
-            desc_light: "You show ZUCK the data privacy regulations. He scoffs, unaffected. 'These people just submit their data anyway. They 'trust me'. Dumb fucks.'".into(),
-            desc_dark: "You show ZUCK the data privacy regulations. He scoffs, unaffected. 'These people just submit their data anyway. They 'trust me'. Dumb fucks.'".into(),
-            doors: vec![Door {
-                target: RoomID(8),
-                triggers: vec![
-                    "use movie".into(),
-                    "movie".into(),
-                    "the social network".into(),
-                    "show movie".into(),
-                    "show social network".into(),
-                    "use social network".into(),
-                    "use the movie".into(),
-                    "show the social network".into(),
-                    "use the social network".into(),
-                ],
-                message: None,
-            }, Door {
-                target: RoomID(9),
-                triggers: vec![
-                    "use lizard spray".into(),
-                    "spray".into(),
-                    "use spray".into(),
-                    "use the spray".into(),
-                    "spray him".into(),
-                    "lizard spray".into(),
-                ],
-                message: None,
-            },
-            ],
-        },
-    ];
+fn get_item(item: Item, at: GameState) -> (bool, usize) {
+    let mut change_val: bool = false;
+    let mut searching: bool = false;
+    let mut time = at.timer;
+    print!("({} minutes remain)\n> ", at.timer);
+            let mut end = false;
+            loop {
+                if (searching && !change_val) || at.sunscreen {
+                    loop {
+                        if at.sunscreen {
+                            print!("{}", item.light_desc);
+                        } else {
+                            print!("{}", item.dark_desc);
+                        }
+                        io::stdout().flush().unwrap();
+                        let mut try_vr = String::new();
+                        io::stdin().read_line(&mut try_vr).unwrap();
+                        let try_vr = try_vr.trim();
+                        if try_vr == "yes" {
+                            change_val = true;
+                            println!("{}", item.pick_up_text);
+                            if item.name == "map" {
+                                make_map(at.room_id)
+                            }
+                            end = true;
+                            break;
+                        } else if try_vr == "no" {
+                            end = true;
+                            break;
+                        } else if try_vr == "i" {
+                            display_inventory(at)
+                        } else {
+                            println!("You can't do that.")
+                        }
+                    }
+                } else {
+                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
+                    io::stdout().flush().unwrap();
+                    let mut crawl = String::new();
+                    io::stdin().read_line(&mut crawl).unwrap();
+                    let crawl = crawl.trim();
+                    if crawl == "yes" {
+                        time -= 2;
+                        searching = true;
+                    } else if crawl == "no" {
+                        end = true;
+                        break;
+                    } else if crawl == "i" {
+                        display_inventory(at)
+                    } else {
+                        println!("You can't do that.")
+                    }
+                }
+                if end {
+                    break;
+                }
+            }
+            searching = false;
+            return (change_val, time);
+}
+fn main() {
+    use std::io;
+    // We need the Write trait so we can flush stdout
+    use std::io::Write;
+
+    let rooms = get_rooms();
 
     let end_rooms = [RoomID(8), RoomID(9)];
     let mut input = String::new();
@@ -624,6 +147,49 @@ fn main() {
     title_screen();
 
     println!("You wake up, dazed and confused, in complete darkness. The last thing you remember is falling asleep at your job at Meta towards the end of your 80-hour work week. A million questions swirl around your mind, but right now there's only one thing to do. ESCAPE.");
+    
+    let vr_item: Item = Item {
+        name: "map".into(),
+        light_desc: "You see a VR headset on the ground - do you try it on? (yes or no) \n> ".into(),
+        dark_desc: "As you crawl around, you feel some kind of headset - do you try it on? (yes or no) \n> ".into(),
+        pick_up_text: "With the headset on, you see a map with your current location in AR! Turns out all the other features are locked in beta, but this will at least make things a little easier.".into(),
+    };
+
+    let key_item: Item = Item {
+        name: "key".into(),
+        light_desc: "You see a key - do you grab it? (yes or no) \n> ".into(),
+        dark_desc: "You nearly trip over a key - do you grab it? (yes or no) \n> ".into(),
+        pick_up_text: "You stuff it in your bag.".into(),
+    };
+
+    let sunscreen_item: Item = Item {
+        name: "sunscreen".into(),
+        light_desc: "You see a UV lamp - do you grab it? (yes or no) \n> ".into(),
+        dark_desc: "You see a UV lamp - do you grab it? (yes or no) \n> ".into(),
+        pick_up_text: "The lamp reveals the entire room with all its doorways, oddly enough lathered in sunscreen. With this, you'll have a much easier time getting around.".into(),
+    };
+
+    let data_item: Item = Item {
+        name: "data".into(),
+        light_desc: "You see a printed copy of data privacy regulations - do you grab it? (yes or no) \n> ".into(),
+        dark_desc: "You feel a large stack of paper. Zuck has been reading about data privacy regulations recently... - do you grab it? (yes or no) \n> ".into(),
+        pick_up_text: "You stuff it in your bag.".into(),
+    };
+
+    let spray_item: Item = Item {
+        name: "spray".into(),
+        light_desc: "You see an anti-lizard spray - do you grab it? (yes or no) \n> ".into(),
+        dark_desc: "You feel a canister... a spray... it could be for lizards... - do you grab it? (yes or no) \n> ".into(),
+        pick_up_text: "You stuff it in your bag.".into(),
+    };
+
+    let movie_item: Item = Item {
+        name: "movie".into(),
+        light_desc: "You see a copy of The Social Network - do you grab it? (yes or no) \n> ".into(),
+        dark_desc: "As you search around, you feel a DVD case. It feels like The Social Network... - do you grab it? (yes or no) \n> ".into(),
+        pick_up_text: "You stuff it in your bag.".into(),
+    };
+
     loop {
         // We don't want to move out of rooms, so we take a reference
         let here = &rooms[at.room_id.0];
@@ -633,6 +199,7 @@ fn main() {
             println!("{}\n{}", here.name, here.desc_light);
         }
 
+        // Don't print map if at boss battle 
         if at.map
             && (at.room_id.0 != 7)
             && (at.room_id.0 != 8)
@@ -644,58 +211,11 @@ fn main() {
 
         // get map logic
         if at.room_id == RoomID(2) && !at.map {
-            print!("({} minutes remain)\n> ", at.timer);
-            let mut end = false;
-            loop {
-                if (at.searching && !at.map) || at.sunscreen {
-                    loop {
-                        if at.sunscreen {
-                            print!("You see a VR headset on the ground - do you try it on? (yes or no) \n> ")
-                        } else {
-                            print!("As you crawl around, you feel some kind of headset - do you try it on? (yes or no) \n> ");
-                        }
-                        io::stdout().flush().unwrap();
-                        let mut try_vr = String::new();
-                        io::stdin().read_line(&mut try_vr).unwrap();
-                        let try_vr = try_vr.trim();
-                        if try_vr == "yes" {
-                            at.map = true;
-                            println!("With the headset on, you see a map with your current location in AR! Turns out all the other features are locked in beta, but this will at least make things a little easier.");
-                            make_map(at.room_id);
-                            end = true;
-                            break;
-                        } else if try_vr == "no" {
-                            end = true;
-                            break;
-                        } else if try_vr == "i" {
-                            display_inventory(at)
-                        } else {
-                            println!("You can't do that.")
-                        }
-                    }
-                } else {
-                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
-                    io::stdout().flush().unwrap();
-                    let mut crawl = String::new();
-                    io::stdin().read_line(&mut crawl).unwrap();
-                    let crawl = crawl.trim();
-                    if crawl == "yes" {
-                        at.timer -= 2;
-                        at.searching = true;
-                    } else if crawl == "no" {
-                        end = true;
-                        break;
-                    } else if crawl == "i" {
-                        display_inventory(at)
-                    } else {
-                        println!("You can't do that.")
-                    }
-                }
-                if end {
-                    break;
-                }
+            let (change, time) = get_item(vr_item.clone(), at);
+            if change {
+                at.map = true
             }
-            at.searching = false;
+            at.timer = time;
         }
 
         // get UV lamp logic
@@ -724,224 +244,38 @@ fn main() {
 
         // get social_net logic
         if at.room_id == RoomID(0) && !at.social_net {
-            print!("({} minutes remain)\n> ", at.timer);
-            let mut end = false;
-            loop {
-                if (at.searching && !at.social_net) || at.sunscreen {
-                    loop {
-                        if at.sunscreen {
-                            print!("You see a copy of The Social Network - do you grab it? (yes or no) \n> ");
-                        } else {
-                            print!("As you search around, you feel a DVD case. It feels like The Social Network... - do you grab it? (yes or no) \n> ");
-                        }
-                        io::stdout().flush().unwrap();
-                        let mut try_vr = String::new();
-                        io::stdin().read_line(&mut try_vr).unwrap();
-                        let try_vr = try_vr.trim();
-                        if try_vr == "yes" {
-                            at.social_net = true;
-                            println!("You stuff it in your bag.");
-                            end = true;
-                            break;
-                        } else if try_vr == "no" {
-                            end = true;
-                            break;
-                        } else if try_vr == "i" {
-                            display_inventory(at)
-                        } else {
-                            println!("You can't do that.")
-                        }
-                    }
-                } else {
-                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
-                    io::stdout().flush().unwrap();
-                    let mut crawl = String::new();
-                    io::stdin().read_line(&mut crawl).unwrap();
-                    let crawl = crawl.trim();
-                    if crawl == "yes" {
-                        at.timer -= 2;
-                        at.searching = true;
-                    } else if crawl == "no" {
-                        end = true;
-                        break;
-                    } else if crawl == "i" {
-                        display_inventory(at)
-                    } else {
-                        println!("You can't do that.")
-                    }
-                }
-                if end {
-                    break;
-                }
+            let (change, time) = get_item(movie_item.clone(), at);
+            if change {
+                at.social_net = true
             }
-            at.searching = false;
+            at.timer = time;
         }
 
         // get data_reg logic
         if at.room_id == RoomID(1) && !at.data_reg {
-            print!("({} minutes remain)\n> ", at.timer);
-            let mut end = false;
-            loop {
-                if (at.searching && !at.data_reg) || at.sunscreen {
-                    loop {
-                        if at.sunscreen {
-                            print!("You see a printed copy of data privacy regulations - do you grab it? (yes or no) \n> ");
-                        } else {
-                            print!("You feel a large stack of paper. Zuck has been reading about data privacy regulations recently... - do you grab it? (yes or no) \n> ");
-                        }
-                        io::stdout().flush().unwrap();
-                        let mut try_vr = String::new();
-                        io::stdin().read_line(&mut try_vr).unwrap();
-                        let try_vr = try_vr.trim();
-                        if try_vr == "yes" {
-                            at.data_reg = true;
-                            println!("You stuff it in your bag.");
-                            end = true;
-                            break;
-                        } else if try_vr == "no" {
-                            end = true;
-                            break;
-                        } else if try_vr == "i" {
-                            display_inventory(at)
-                        } else {
-                            println!("You can't do that.")
-                        }
-                    }
-                } else {
-                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
-                    io::stdout().flush().unwrap();
-                    let mut crawl = String::new();
-                    io::stdin().read_line(&mut crawl).unwrap();
-                    let crawl = crawl.trim();
-                    if crawl == "yes" {
-                        at.timer -= 2;
-                        at.searching = true;
-                    } else if crawl == "no" {
-                        end = true;
-                        break;
-                    } else if crawl == "i" {
-                        display_inventory(at)
-                    } else {
-                        println!("You can't do that.")
-                    }
-                }
-                if end {
-                    break;
-                }
+            let (change, time) = get_item(data_item.clone(), at);
+            if change {
+                at.data_reg = true
             }
-            at.searching = false;
+            at.timer = time;
         }
 
         // get spray logic
         if at.room_id == RoomID(5) && !at.spray {
-            print!("({} minutes remain)\n> ", at.timer);
-            let mut end = false;
-            loop {
-                if (at.searching && !at.spray) || at.sunscreen {
-                    loop {
-                        if at.sunscreen {
-                            print!(
-                                "You see an anti-lizard spray - do you grab it? (yes or no) \n> "
-                            );
-                        } else {
-                            print!("You feel a canister... a spray... it could be for lizards... - do you grab it? (yes or no) \n> ");
-                        }
-                        io::stdout().flush().unwrap();
-                        let mut try_vr = String::new();
-                        io::stdin().read_line(&mut try_vr).unwrap();
-                        let try_vr = try_vr.trim();
-                        if try_vr == "yes" {
-                            at.spray = true;
-                            println!("You stuff it in your bag.");
-                            end = true;
-                            break;
-                        } else if try_vr == "no" {
-                            end = true;
-                            break;
-                        } else if try_vr == "i" {
-                            display_inventory(at)
-                        } else {
-                            println!("You can't do that.")
-                        }
-                    }
-                } else {
-                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
-                    io::stdout().flush().unwrap();
-                    let mut crawl = String::new();
-                    io::stdin().read_line(&mut crawl).unwrap();
-                    let crawl = crawl.trim();
-                    if crawl == "yes" {
-                        at.timer -= 2;
-                        at.searching = true;
-                    } else if crawl == "no" {
-                        end = true;
-                        break;
-                    } else if crawl == "i" {
-                        display_inventory(at)
-                    } else {
-                        println!("You can't do that.")
-                    }
-                }
-                if end {
-                    break;
-                }
+            let (change, time) = get_item(spray_item.clone(), at);
+            if change {
+                at.spray = true
             }
-            at.searching = false;
+            at.timer = time;
         }
 
         // get key logic
         if at.room_id == RoomID(3) && !at.key {
-            print!("({} minutes remain)\n> ", at.timer);
-            let mut end = false;
-            loop {
-                if (at.searching && !at.key) || at.sunscreen {
-                    loop {
-                        if at.sunscreen {
-                            print!("You see a key - do you grab it? (yes or no) \n> ");
-                        } else {
-                            print!("You nearly trip over a key - do you grab it? (yes or no) \n> ");
-                        }
-                        io::stdout().flush().unwrap();
-                        let mut try_vr = String::new();
-                        io::stdin().read_line(&mut try_vr).unwrap();
-                        let try_vr = try_vr.trim();
-                        if try_vr == "yes" {
-                            at.key = true;
-                            println!("You stuff it in your bag.");
-                            end = true;
-                            break;
-                        } else if try_vr == "no" {
-                            end = true;
-                            break;
-                        } else if try_vr == "i" {
-                            display_inventory(at)
-                        } else {
-                            println!("You can't do that.")
-                        }
-                    }
-                } else {
-                    print!("Do you crawl around to see what is in the room? (yes or no -- cost = 2 min) \n> ");
-                    io::stdout().flush().unwrap();
-                    let mut crawl = String::new();
-                    io::stdin().read_line(&mut crawl).unwrap();
-                    let crawl = crawl.trim();
-                    if crawl == "yes" {
-                        at.timer -= 2;
-                        at.searching = true;
-                    } else if crawl == "no" {
-                        end = true;
-                        break;
-                    } else if crawl == "i" {
-                        display_inventory(at)
-                    } else {
-                        println!("You can't do that.")
-                    }
-                }
-                if end {
-                    break;
-                }
+            let (change, time) = get_item(key_item.clone(), at);
+            if change {
+                at.key = true
             }
-            at.searching = false;
+            at.timer = time;
         }
 
         loop {
