@@ -725,18 +725,7 @@ fn main() {
             }
         }
 
-        if end_rooms.contains(&at.room_id) {
-            at.boss_hp -=1;
-            if at.boss_hp == 0 {
-                at.win = true;
-            }
-        }
-        if at.win == true {
-            break;
-        }
-        if at.timer == 0 {
-            break;
-        }
+        
         loop {
             print!("What will you do?\n");
             print!("({} minutes remain)\n> ", at.timer);
@@ -759,13 +748,28 @@ fn main() {
                 at.timer -= 1;
                 break;
             } else {
+                at.timer -=1;
                 if at.timer == 0{
                     break;
                 }
-                at.timer -=1;
                 println!("That doesn't seem to work, unfortunately. Your breathing starts to get more labored.");
             }
             }
+            
+        }
+        if end_rooms.contains(&at.room_id) {
+            at.boss_hp -=1;
+            if at.boss_hp == 0 {
+                let here = &rooms[at.room_id.0];
+                println!("{}\n{}", here.name, here.desc_light);
+                at.win = true;
+            }
+        }
+        if at.win == true {
+            break;
+        }
+        if at.timer == 0 {
+            break;
         }
     }
     if at.win == true{
