@@ -330,7 +330,6 @@ fn main() {
                             at.room_id = door.target;
                             at.timer -= 1;
                             at.data_reg = false;
-                            at.boss_hp -= 1;
                         } else {
                             println!("\n");
                             println!("\n**You don't have the necessary item!**\n");
@@ -384,12 +383,12 @@ fn main() {
     if at.win {
         println!("ZUCK collapses. You rush out the exit.");
         println!("You see a blinding light...as you step forward you emerge onto the sunny streets of Menlo Park. A new, yet uncertain future awaits for you.");
-        println!("You win");
+        println!("You win!!!");
         println!("THE END");
     }
     if !at.win {
         println!("You collapse to the ground, out of breath. As your vision starts to fade, you see ZUCK crouching over you, smiling. The last words you hear are: 'unfortunately there's going to be another around of layoffs...'");
-        println!("You lose");
+        println!("You lose...");
         println!("THE END");  
     }
 }
