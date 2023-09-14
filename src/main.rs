@@ -114,7 +114,7 @@ fn get_item(item: Item, at: GameState) -> (bool, usize) {
                         time -= 2;
                         searching = true;
                     } else if crawl == "no" {
-                        end = true;
+                        // end = true;
                         break;
                     } else if crawl == "i" {
                         display_inventory(at)
@@ -126,13 +126,13 @@ fn get_item(item: Item, at: GameState) -> (bool, usize) {
                     break;
                 }
             }
-            searching = false;
+            // searching = false;
             return (change_val, time);
 }
 fn main() {
-    use std::io;
+    // use std::io;
     // We need the Write trait so we can flush stdout
-    use std::io::Write;
+    // use std::io::Write;
 
     let rooms = get_rooms();
 
@@ -171,12 +171,12 @@ fn main() {
         pick_up_text: "You stuff it in your bag.".into(),
     };
 
-    let sunscreen_item: Item = Item {
+    /* let sunscreen_item: Item = Item {
         name: "sunscreen".into(),
         light_desc: "You see a UV lamp - do you grab it? (yes or no) \n> ".into(),
         dark_desc: "You see a UV lamp - do you grab it? (yes or no) \n> ".into(),
         pick_up_text: "The lamp reveals the entire room with all its doorways, oddly enough lathered in sunscreen. With this, you'll have a much easier time getting around.".into(),
-    };
+    }; */
 
     let data_item: Item = Item {
         name: "data".into(),
@@ -230,7 +230,7 @@ fn main() {
         // get UV lamp logic
         if at.room_id == RoomID(4) && !at.sunscreen {
             print!("({} minutes remain)\n> ", at.timer);
-            let mut end = false;
+            // let mut end = false;
             loop {
                 print!("You see a UV lamp - do you grab it? (yes or no) \n> ");
                 io::stdout().flush().unwrap();
