@@ -5,7 +5,7 @@ use crate::RoomID;
 pub fn get_rooms() -> [Room;11] { return [
         Room {
             name: "The Start\n-----------------------".into(), // Turn a &'static string (string constant) into a String
-            desc_light: "You see an entryway to the north, east, and south.".into(),
+            desc_light: "Looks like this is where you first woke up. You see doorways to the north, east, and south.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
@@ -53,7 +53,7 @@ pub fn get_rooms() -> [Room;11] { return [
         },
         Room {
             name: "Whatsapp Room\n-----------------------".into(),
-            desc_light: "its light".into(),
+            desc_light: "Phones of all types are scattered throughout the room. Doorways lead to the south and east.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
@@ -87,7 +87,7 @@ pub fn get_rooms() -> [Room;11] { return [
         },
         Room {
             name: "VR Room\n-----------------------".into(),
-            desc_light: "Dozens of Oculus headsets are strewn.".into(),
+            desc_light: "Dozens of Oculus headsets are strewn. Doorways lead to the south and north.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
@@ -121,7 +121,7 @@ pub fn get_rooms() -> [Room;11] { return [
         },
         Room {
             name: "The Library\n-----------------------".into(),
-            desc_light: "Stacks of books line the walls.".into(),
+            desc_light: "Stacks of books line the walls. Doorways point to the north, south, and west.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
@@ -167,8 +167,8 @@ pub fn get_rooms() -> [Room;11] { return [
         },
         Room {
             name: "The Sunscreen Room\n-----------------------".into(),
-            desc_light: "its light".into(),
-            desc_dark: "its dark".into(), // should be same as light cuz has a light
+            desc_light: "With the UV lamp on, you see apparently random markings on the wall, made from sunscreen.".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(), 
             doors: vec![
                 Door {
                     target: RoomID(3),

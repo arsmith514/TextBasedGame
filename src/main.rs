@@ -48,9 +48,9 @@ pub struct GameState {
     key: bool,       //library
     sunscreen: bool, // SS
     map: bool,       // VR
-    win: bool,
-    timer: usize,
-    boss_hp: usize,
+    win: bool,       // win condition
+    timer: usize,    // timer: game over if it gets to 0
+    boss_hp: usize,  // how many hits boss can take
     spray: bool,      // anti lizard spray -- end room
     data_reg: bool,   // data-privacy regulations -- Whatsapp room
     social_net: bool, // copy of the Social Network -- start
@@ -181,7 +181,7 @@ fn main() {
     let data_item: Item = Item {
         name: "data".into(),
         light_desc: "You see a printed copy of data privacy regulations - do you grab it? (yes or no) \n> ".into(),
-        dark_desc: "You feel a large stack of paper. Zuck has been reading about data privacy regulations recently... - do you grab it? (yes or no) \n> ".into(),
+        dark_desc: "You feel a large stack of paper. ZUCK has been reading about data privacy regulations recently... - do you grab it? (yes or no) \n> ".into(),
         pick_up_text: "You stuff it in your bag.".into(),
     };
 
@@ -351,7 +351,7 @@ fn main() {
                         at.room_id = door.target;
                         at.timer -= 1;
                     }
-                    
+                    // print zuck ascii when we get to boss fight (only once)
                     if at.room_id.0 == 7 && count == 0 {
                         print_zuck();
                         count += 1;
@@ -373,6 +373,7 @@ fn main() {
                 at.win = true;
             }
         }
+        // game is over conditions
         if at.win {
             break;
         }
@@ -381,14 +382,14 @@ fn main() {
         }
     }
     if at.win {
-        println!("Zuck collapses. You rush out the exit.");
+        println!("ZUCK collapses. You rush out the exit.");
         println!("You see a blinding light...as you step forward you emerge onto the sunny streets of Menlo Park. A new, yet uncertain future awaits for you.");
         println!("You win");
         println!("THE END");
     }
     if !at.win {
-        println!("You collapse to the ground, out of breath. As your vision starts to fade, you see ZUCK crouching over you, smiling. The last words you hear are: 'unfortnately there's going to be another around of layoffs...'");
-        println!("You loose");
+        println!("You collapse to the ground, out of breath. As your vision starts to fade, you see ZUCK crouching over you, smiling. The last words you hear are: 'unfortunately there's going to be another around of layoffs...'");
+        println!("You lose");
         println!("THE END");  
     }
 }
