@@ -121,7 +121,7 @@ pub fn get_rooms() -> [Room;11] { return [
         },
         Room {
             name: "The Library\n-----------------------".into(),
-            desc_light: "Stacks of books line the walls. Doorways point to the north, south, and west.".into(),
+            desc_light: "Stacks of books line the walls. Doorways point to the north and west.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
@@ -156,7 +156,7 @@ pub fn get_rooms() -> [Room;11] { return [
         },
         Room {
             name: "The Sunscreen Room\n-----------------------".into(),
-            desc_light: "With the UV lamp on, you see apparently random markings on the wall, made from sunscreen.".into(),
+            desc_light: "With the UV lamp on, you see apparently random markings on the wall, made from sunscreen. Doorways line the east, west, and south walls.".into(),
             desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(), 
             doors: vec![
                 Door {
