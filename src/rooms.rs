@@ -1,6 +1,7 @@
 use crate::Room;
 use crate::Door;
 use crate::RoomID;
+
 pub fn get_rooms() -> [Room;11] { return [
         Room {
             name: "The Start\n-----------------------".into(), // Turn a &'static string (string constant) into a String
@@ -19,6 +20,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
                 Door {
                     target: RoomID(2),
@@ -32,6 +34,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
                 Door {
                     target: RoomID(3),
@@ -44,6 +47,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
             ],
         },
@@ -63,6 +67,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
                 Door {
                     target: RoomID(2),
@@ -76,6 +81,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
             ],
         },
@@ -95,6 +101,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
                 Door {
                     target: RoomID(1),
@@ -108,6 +115,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
             ],
         },
@@ -127,6 +135,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
                 Door {
                     target: RoomID(4),
@@ -141,6 +150,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
                 Door {
                     target: RoomID(6),
@@ -151,6 +161,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
             ],
         },
@@ -170,6 +181,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
                 Door {
                     target: RoomID(5),
@@ -182,6 +194,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
                 Door {
                     target: RoomID(6),
@@ -194,6 +207,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
             ],
         },
@@ -215,6 +229,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 47,
                 },
                 Door {
                     target: RoomID(7),
@@ -229,6 +244,7 @@ pub fn get_rooms() -> [Room;11] { return [
                         "door".into(),
                     ],
                     message: None,
+                    required_item: 1,
                 },
             ],
         },
@@ -249,6 +265,7 @@ pub fn get_rooms() -> [Room;11] { return [
                     "library".into(),
                 ],
                 message: None,
+                required_item: 47,
             }],
         },
         Room {
@@ -267,8 +284,10 @@ pub fn get_rooms() -> [Room;11] { return [
                     "use the movie".into(),
                     "show the social network".into(),
                     "use the social network".into(),
+                    "social network".into(),
                 ],
                 message: None,
+                required_item: 4,
             }, Door {
                 target: RoomID(9),
                 triggers: vec![
@@ -281,6 +300,7 @@ pub fn get_rooms() -> [Room;11] { return [
                     "anti-lizard spray".into(),
                 ],
                 message: None,
+                required_item: 2,
             },
             Door {
                 target: RoomID(10),
@@ -299,6 +319,7 @@ pub fn get_rooms() -> [Room;11] { return [
                     "data privacy".into(),
                 ],
                 message: None,
+                required_item: 3,
             },
             ],
         },
@@ -315,8 +336,10 @@ pub fn get_rooms() -> [Room;11] { return [
                     "use the spray".into(),
                     "spray him".into(),
                     "lizard spray".into(),
+                    "anti-lizard spray".into(),
                 ],
                 message: None,
+                required_item: 2,
             },
             Door {
                 target: RoomID(10),
@@ -328,8 +351,11 @@ pub fn get_rooms() -> [Room;11] { return [
                     "use data privacy regulations".into(),
                     "use the data privacy regulations".into(),
                     "show the data privacy regulations".into(),
+                    "data-privacy".into(),
+                    "data privacy".into(),
                 ],
                 message: None,
+                required_item: 3,
             },
             ],
         },
@@ -349,8 +375,10 @@ pub fn get_rooms() -> [Room;11] { return [
                     "use the movie".into(),
                     "show the social network".into(),
                     "use the social network".into(),
+                    "social network".into(),
                 ],
                 message: None,
+                required_item: 4,
             },
             Door {
                 target: RoomID(10),
@@ -362,8 +390,11 @@ pub fn get_rooms() -> [Room;11] { return [
                     "use data privacy regulations".into(),
                     "use the data privacy regulations".into(),
                     "show the data privacy regulations".into(),
+                    "data-privacy".into(),
+                    "data privacy".into(),
                 ],
                 message: None,
+                required_item: 3,
             },
             ],
         },
@@ -383,8 +414,10 @@ pub fn get_rooms() -> [Room;11] { return [
                     "use the movie".into(),
                     "show the social network".into(),
                     "use the social network".into(),
+                    "social network".into(),
                 ],
                 message: None,
+                required_item: 4,
             }, Door {
                 target: RoomID(9),
                 triggers: vec![
@@ -394,8 +427,10 @@ pub fn get_rooms() -> [Room;11] { return [
                     "use the spray".into(),
                     "spray him".into(),
                     "lizard spray".into(),
+                    "anti-lizard spray".into(),
                 ],
                 message: None,
+                required_item: 2,
             },
             ],
         },
