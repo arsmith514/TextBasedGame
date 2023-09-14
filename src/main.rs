@@ -15,10 +15,18 @@ pub struct Room {
     desc_dark: String,
     doors: Vec<Door>,
 }
+
+// required items
+// 1 = key
+// 2 = spray
+// 3 = data_reg
+// 4 = social_net
+// 47 = none
 pub struct Door {
     target: RoomID,        // More about this in a minute
     triggers: Vec<String>, // e.g. "go north", "north"
     message: Option<String>, // What message, if any, to print when the doorway is traversed
+    required_item: usize,
                            // Any other info about the door would go here
 }
 
@@ -32,6 +40,7 @@ pub struct Item {
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct RoomID(usize);
+
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct GameState {
@@ -136,7 +145,7 @@ fn main() {
         sunscreen: false,
         map: false,
         win: false,
-        timer: 20,
+        timer: 30,
         boss_hp: 2,
         spray: false,      // anti lizard spray
         data_reg: false,   // data-privacy regulations
@@ -189,7 +198,7 @@ fn main() {
         dark_desc: "As you search around, you feel a DVD case. It feels like The Social Network... - do you grab it? (yes or no) \n> ".into(),
         pick_up_text: "You stuff it in your bag.".into(),
     };
-
+    let mut count = 0;
     loop {
         // We don't want to move out of rooms, so we take a reference
         let here = &rooms[at.room_id.0];
@@ -277,7 +286,6 @@ fn main() {
             }
             at.timer = time;
         }
-
         loop {
             print!("What will you do?\n> ");
             print!("({} minutes remain)\n> ", at.timer);
@@ -296,10 +304,57 @@ fn main() {
                     if let Some(msg) = &door.message {
                         println!("{}", msg);
                     }
-                    at.room_id = door.target;
-                    at.timer -= 1;
-                    if at.room_id.0 == 7 {
+                    if door.required_item == 1 {
+                        if at.key {
+                            at.room_id = door.target;
+                            at.timer -= 1;
+                            at.key = false;
+                        } else {
+                            println!("\n");
+                            println!("\n**You don't have the necessary item!**\n");
+                            println!("\n");
+                        }
+                    } else if door.required_item == 2 {
+                        if at.spray {
+                            at.room_id = door.target;
+                            at.timer -= 1;
+                            at.spray = false;
+                            at.boss_hp -= 1;
+                        } else {
+                            println!("\n");
+                            println!("\n**You don't have the necessary item!**\n");
+                            println!("\n");
+                        }
+                    } else if door.required_item == 3 {
+                        if at.data_reg {
+                            at.room_id = door.target;
+                            at.timer -= 1;
+                            at.data_reg = false;
+                            at.boss_hp -= 1;
+                        } else {
+                            println!("\n");
+                            println!("\n**You don't have the necessary item!**\n");
+                            println!("\n");
+                        }
+                    } else if door.required_item == 4 {
+                        if at.social_net {
+                            at.room_id = door.target;
+                            at.timer -= 1;
+                            at.social_net = false;
+                            at.boss_hp -= 1;
+                        } else {
+                            println!("\n");
+                            println!("\n**You don't have the necessary item!**\n");
+                            println!("\n");
+                        }
+                    } else {
+                        at.room_id = door.target;
+                        at.timer -= 1;
+                    }
+                    
+                    if at.room_id.0 == 7 && count == 0 {
                         print_zuck();
+                        count += 1;
                     }
                     break;
                 } else {
@@ -312,7 +367,6 @@ fn main() {
             }
         }
         if end_rooms.contains(&at.room_id) {
-            at.boss_hp -= 1;
             if at.boss_hp == 0 {
                 let here = &rooms[at.room_id.0];
                 println!("{}\n{}", here.name, here.desc_light);
