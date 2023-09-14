@@ -152,17 +152,6 @@ pub fn get_rooms() -> [Room;11] { return [
                     message: None,
                     required_item: 47,
                 },
-                Door {
-                    target: RoomID(6),
-                    triggers: vec![
-                        "go south".into(),
-                        "south".into(),
-                        "nothing".into(),
-                        "door".into(),
-                    ],
-                    message: None,
-                    required_item: 47,
-                },
             ],
         },
         Room {
@@ -262,7 +251,7 @@ pub fn get_rooms() -> [Room;11] { return [
                     "go north".into(),
                     "go back".into(),
                     "back".into(),
-                    "library".into(),
+                    "sunscreen".into(),
                 ],
                 message: None,
                 required_item: 47,
