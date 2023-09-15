@@ -6,7 +6,7 @@ pub fn get_rooms() -> [Room;11] { return [
         Room {
             name: "The Start\n-----------------------".into(), // Turn a &'static string (string constant) into a String
             desc_light: "Looks like this is where you first woke up. You see doorways to the north, east, and south.".into(),
-            desc_dark: "It's pitch black, and you're forced to choose a direction hoping there's something there. There's got to be a better way...".into(),
+            desc_dark: "It's pitch black, and you're forced to choose a direction (north, south, east, or west) hoping there's something there. There's got to be a better way...".into(),
             doors: vec![
                 Door {
                     target: RoomID(1),
@@ -274,6 +274,8 @@ pub fn get_rooms() -> [Room;11] { return [
                     "show the social network".into(),
                     "use the social network".into(),
                     "social network".into(),
+                    "The Social Network".into(),
+                    "use The Social Network".into(),
                 ],
                 message: None,
                 required_item: 4,
@@ -287,6 +289,7 @@ pub fn get_rooms() -> [Room;11] { return [
                     "spray him".into(),
                     "lizard spray".into(),
                     "anti-lizard spray".into(),
+                    "use anti-lizard spray".into(),
                 ],
                 message: None,
                 required_item: 2,
